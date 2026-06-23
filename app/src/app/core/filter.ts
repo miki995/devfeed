@@ -6,17 +6,23 @@ export interface FilterOptions {
   disabledSourceIds: string[];
   onlySaved?: boolean;
   savedArticleIds?: string[];
+  hideRead?: boolean;
+  readArticleIds?: string[];
 }
 
 export function filterArticles(articles: Article[], options: FilterOptions): Article[] {
   const normalizedSearch = options.search.trim().toLowerCase();
   const disabled = new Set(options.disabledSourceIds);
   const saved = new Set(options.savedArticleIds ?? []);
+  const read = new Set(options.readArticleIds ?? []);
   return articles.filter((article) => {
     if (disabled.has(article.sourceId)) {
       return false;
     }
     if (options.onlySaved && !saved.has(article.id)) {
+      return false;
+    }
+    if (options.hideRead && read.has(article.id) && !saved.has(article.id)) {
       return false;
     }
     if (options.category !== 'all' && article.category !== options.category) {

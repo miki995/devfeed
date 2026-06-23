@@ -10,6 +10,7 @@ export interface Prefs {
   lastVisitAt: string;
   lastCategory: string;
   lastView: string;
+  hideRead: boolean;
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -21,6 +22,7 @@ export const DEFAULT_PREFS: Prefs = {
   lastVisitAt: '',
   lastCategory: 'all',
   lastView: 'all',
+  hideRead: false,
 };
 
 const STORAGE_KEY = 'devfeed.prefs';

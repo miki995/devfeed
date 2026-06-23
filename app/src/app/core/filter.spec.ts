@@ -39,6 +39,18 @@ describe('filterArticles', () => {
     expect(result.map((item) => item.id)).toEqual(['1', '3']);
   });
 
+  it('hides read articles when hideRead is set, unless saved', () => {
+    const result = filterArticles(articles, {
+      category: 'all',
+      search: '',
+      disabledSourceIds: [],
+      hideRead: true,
+      readArticleIds: ['1', '3'],
+      savedArticleIds: ['3'],
+    });
+    expect(result.map((item) => item.id)).toEqual(['2', '3']);
+  });
+
   it('keeps only saved articles when onlySaved is set', () => {
     const result = filterArticles(articles, {
       category: 'all',

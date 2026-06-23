@@ -67,6 +67,7 @@ export class FeedGlobalStateService {
   readonly savedArticleIds: Signal<string[]> = computed(() => this.prefs().savedArticleIds);
   readonly readArticleIds: Signal<string[]> = computed(() => this.prefs().readArticleIds);
   readonly theme: Signal<string> = computed(() => this.prefs().theme);
+  readonly hideRead: Signal<boolean> = computed(() => this.prefs().hideRead);
 
   readonly visibleArticles: Signal<Article[]> = computed(() =>
     filterArticles(this.articles(), {
@@ -75,6 +76,8 @@ export class FeedGlobalStateService {
       disabledSourceIds: this.disabledSourceIds(),
       onlySaved: this.view() === 'saved',
       savedArticleIds: this.savedArticleIds(),
+      hideRead: this.hideRead() && this.view() !== 'saved',
+      readArticleIds: this.readArticleIds(),
     }),
   );
 
@@ -147,6 +150,23 @@ export class FeedGlobalStateService {
 
   setTheme(theme: string): void {
     this.commit({ ...this.prefs(), theme });
+  }
+
+  toggleHideRead(): void {
+    this.commit({ ...this.prefs(), hideRead: !this.prefs().hideRead });
+  }
+
+  markAllVisibleRead(): void {
+    const current = this.prefs();
+    const merged = new Set(current.readArticleIds);
+    for (const article of this.visibleArticles()) {
+      merged.add(article.id);
+    }
+    this.commit({ ...current, readArticleIds: Array.from(merged) });
+  }
+
+  clearSaved(): void {
+    this.commit({ ...this.prefs(), savedArticleIds: [] });
   }
 
   private commit(next: Prefs): void {

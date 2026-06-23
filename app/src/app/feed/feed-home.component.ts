@@ -38,6 +38,18 @@ import { TimeAgoPipe } from './time-ago.pipe';
               }
             </button>
           </div>
+          <div class="actions">
+            @if (state.view() === 'saved') {
+              @if (state.savedCount()) {
+                <button type="button" class="link" (click)="state.clearSaved()">Clear saved</button>
+              }
+            } @else {
+              <button type="button" class="link" [class.on]="state.hideRead()" (click)="state.toggleHideRead()">
+                {{ state.hideRead() ? 'Showing unread' : 'Hide read' }}
+              </button>
+              <button type="button" class="link" (click)="state.markAllVisibleRead()">Mark all read</button>
+            }
+          </div>
           <span class="meta">
             {{ state.visibleArticles().length }} stories
             @if (state.generatedAt()) {
@@ -118,8 +130,26 @@ import { TimeAgoPipe } from './time-ago.pipe';
         padding: 1px 7px;
         font-weight: 600;
       }
-      .meta {
+      .actions {
+        display: flex;
+        gap: 14px;
         margin-left: auto;
+      }
+      .link {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 12px;
+        cursor: pointer;
+        padding: 0;
+      }
+      .link:hover,
+      .link.on {
+        color: var(--accent);
+      }
+      .meta {
+        margin-left: 0;
         font-family: var(--mono);
         font-size: 12px;
         color: var(--faint);
