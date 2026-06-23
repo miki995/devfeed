@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FeedGlobalStateService } from './core/feed.state';
+import { ReleaseNotificationService } from './core/notify.service';
 import { cycleChannel } from './core/navigation';
 import { SourcesPanelComponent } from './feed/sources-panel.component';
 
@@ -27,6 +28,7 @@ const THEMES: ThemeOption[] = [
 })
 export class App {
   protected readonly state = inject(FeedGlobalStateService);
+  private readonly notifications = inject(ReleaseNotificationService);
   protected readonly themeLabel = computed(() => THEMES.find((theme) => theme.id === this.state.theme())?.label ?? 'Midnight');
   protected readonly sourcesOpen = signal<boolean>(false);
   protected readonly helpOpen = signal<boolean>(false);

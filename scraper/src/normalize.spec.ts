@@ -1,4 +1,4 @@
-import { hashUrl, stripHtml, truncate, summarize, toReadableText, dedupeByUrl, sortByDateDesc, capPerSource } from './normalize';
+import { hashUrl, stripHtml, truncate, summarize, toReadableText, readingMinutes, dedupeByUrl, sortByDateDesc, capPerSource } from './normalize';
 import type { Article } from '@shared/index';
 
 const makeArticle = (over: Partial<Article>): Article => ({
@@ -48,6 +48,11 @@ describe('normalize', () => {
 
   it('toReadableText returns empty for missing input', () => {
     expect(toReadableText(undefined)).toBe('');
+  });
+
+  it('readingMinutes is at least one and scales with word count', () => {
+    expect(readingMinutes('a few words')).toBe(1);
+    expect(readingMinutes('word '.repeat(600))).toBe(3);
   });
 
   it('summarize strips html and caps length', () => {

@@ -39,6 +39,33 @@ describe('filterArticles', () => {
     expect(result.map((item) => item.id)).toEqual(['1', '3']);
   });
 
+  it('mutes articles whose title or summary contains a muted keyword, unless saved', () => {
+    const withCrypto = [
+      article({ id: '1', title: 'Crypto mining in JS' }),
+      article({ id: '2', title: 'Angular update' }),
+      article({ id: '3', title: 'Crypto saved one', sourceId: 'angular-blog' }),
+    ];
+    const result = filterArticles(withCrypto, {
+      category: 'all',
+      search: '',
+      disabledSourceIds: [],
+      mutedKeywords: ['crypto'],
+      savedArticleIds: ['3'],
+    });
+    expect(result.map((item) => item.id)).toEqual(['2', '3']);
+  });
+
+  it('searches the provided full-text index when present', () => {
+    const index = new Map<string, string>([['2', 'spring boot virtual threads loom guide']]);
+    const result = filterArticles(articles, {
+      category: 'all',
+      search: 'loom',
+      disabledSourceIds: [],
+      searchIndex: index,
+    });
+    expect(result.map((item) => item.id)).toEqual(['2']);
+  });
+
   it('hides read articles when hideRead is set, unless saved', () => {
     const result = filterArticles(articles, {
       category: 'all',

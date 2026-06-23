@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FeedGlobalStateService } from '../core/feed.state';
 import { ArticleCardComponent } from './article-card.component';
 import { ChannelRailComponent } from './channel-rail.component';
@@ -7,7 +8,7 @@ import { TimeAgoPipe } from './time-ago.pipe';
 
 @Component({
   selector: 'df-feed-home',
-  imports: [ArticleCardComponent, ChannelRailComponent, ReleaseTickerComponent, TimeAgoPipe],
+  imports: [ArticleCardComponent, ChannelRailComponent, ReleaseTickerComponent, TimeAgoPipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <df-release-ticker [releases]="state.latestReleases()" />
@@ -37,6 +38,9 @@ import { TimeAgoPipe } from './time-ago.pipe';
                 <span class="badge">{{ state.savedCount() }}</span>
               }
             </button>
+            <button type="button" [class.active]="state.view() === 'trending'" (click)="state.setView('trending')">
+              Trending
+            </button>
           </div>
           <div class="actions">
             @if (state.view() === 'saved') {
@@ -58,8 +62,40 @@ import { TimeAgoPipe } from './time-ago.pipe';
           </span>
         </div>
 
+        @if (showRecent()) {
+          <div class="recent">
+            <span class="recent-label">Jump back in</span>
+            @for (item of state.recentlyOpened(); track item.id) {
+              <a class="recent-chip" [routerLink]="['/read', item.id]">{{ item.title }}</a>
+            }
+          </div>
+        }
+
         @if (state.loading()) {
           <p class="status">Loading the latest…</p>
+        } @else if (!state.visibleArticles().length) {
+          @if (state.view() === 'saved') {
+            <div class="empty">
+              <p class="empty-title">No saved stories yet</p>
+              <p class="empty-sub">Tap the ★ on any story to keep it here for later.</p>
+              <button type="button" class="empty-action" (click)="state.setView('all')">Browse Latest</button>
+            </div>
+          } @else {
+            <p class="status">Nothing matches your filters yet. Try another channel.</p>
+          }
+        } @else if (useGroups()) {
+          @for (group of state.grouped(); track group.label) {
+            <h3 class="day">{{ group.label }}</h3>
+            @for (article of group.articles; track article.id) {
+              <df-article-card
+                [article]="article"
+                [saved]="savedIds().has(article.id)"
+                [isRead]="readIds().has(article.id)"
+                [isNew]="state.newArticleIds().has(article.id)"
+                (save)="state.toggleSaved($event)"
+              />
+            }
+          }
         } @else {
           @for (article of state.visibleArticles(); track article.id) {
             <df-article-card
@@ -69,16 +105,6 @@ import { TimeAgoPipe } from './time-ago.pipe';
               [isNew]="state.newArticleIds().has(article.id)"
               (save)="state.toggleSaved($event)"
             />
-          } @empty {
-            @if (state.view() === 'saved') {
-              <div class="empty">
-                <p class="empty-title">No saved stories yet</p>
-                <p class="empty-sub">Tap the ★ on any story to keep it here for later.</p>
-                <button type="button" class="empty-action" (click)="state.setView('all')">Browse Latest</button>
-              </div>
-            } @else {
-              <p class="status">Nothing matches your filters yet. Try another channel.</p>
-            }
           }
         }
       </main>
@@ -159,6 +185,47 @@ import { TimeAgoPipe } from './time-ago.pipe';
         font-size: 13px;
         padding: 40px 0;
       }
+      .recent {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 0 14px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 6px;
+      }
+      .recent-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-right: 4px;
+      }
+      .recent-chip {
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12.5px;
+        color: var(--muted);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 5px 12px;
+      }
+      .recent-chip:hover {
+        color: var(--text);
+        border-color: var(--faint);
+      }
+      .day {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin: 26px 0 4px;
+      }
       .empty {
         padding: 60px 0;
         text-align: center;
@@ -205,4 +272,8 @@ export class FeedHomeComponent {
 
   readonly savedIds = computed(() => new Set(this.state.savedArticleIds()));
   readonly readIds = computed(() => new Set(this.state.readArticleIds()));
+  readonly useGroups = computed(() => this.state.view() !== 'trending' && !this.state.searchText().trim());
+  readonly showRecent = computed(
+    () => this.state.view() === 'all' && !this.state.searchText().trim() && this.state.recentlyOpened().length > 0,
+  );
 }

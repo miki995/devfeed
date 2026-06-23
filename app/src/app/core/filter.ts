@@ -8,6 +8,8 @@ export interface FilterOptions {
   savedArticleIds?: string[];
   hideRead?: boolean;
   readArticleIds?: string[];
+  mutedKeywords?: string[];
+  searchIndex?: Map<string, string>;
 }
 
 export function filterArticles(articles: Article[], options: FilterOptions): Article[] {
@@ -15,6 +17,7 @@ export function filterArticles(articles: Article[], options: FilterOptions): Art
   const disabled = new Set(options.disabledSourceIds);
   const saved = new Set(options.savedArticleIds ?? []);
   const read = new Set(options.readArticleIds ?? []);
+  const mutedKeywords = (options.mutedKeywords ?? []).map((keyword) => keyword.toLowerCase()).filter(Boolean);
   return articles.filter((article) => {
     if (disabled.has(article.sourceId)) {
       return false;
@@ -28,10 +31,18 @@ export function filterArticles(articles: Article[], options: FilterOptions): Art
     if (options.category !== 'all' && article.category !== options.category) {
       return false;
     }
+    const titleAndSummary = `${article.title} ${article.summary}`.toLowerCase();
+    if (mutedKeywords.length && !saved.has(article.id)) {
+      const muted = mutedKeywords.some((keyword) => titleAndSummary.includes(keyword));
+      if (muted) {
+        return false;
+      }
+    }
     if (!normalizedSearch) {
       return true;
     }
-    const haystack = `${article.title} ${article.summary}`.toLowerCase();
+    const indexed = options.searchIndex?.get(article.id);
+    const haystack = indexed ?? titleAndSummary;
     return haystack.includes(normalizedSearch);
   });
 }

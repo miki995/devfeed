@@ -21,6 +21,9 @@ import { TimeAgoPipe } from './time-ago.pipe';
             <span class="new">NEW</span>
           }
           <span class="src">{{ article().sourceName }}</span>
+          @if (article().readMinutes) {
+            <span class="src">· {{ article().readMinutes }} min</span>
+          }
           <span class="time">{{ article().publishedAt | timeAgo }}</span>
         </div>
         <a class="title" [routerLink]="['/read', article().id]">

@@ -34,6 +34,11 @@ export function summarize(html: string | undefined): string {
   return truncate(stripHtml(html), 240);
 }
 
+export function readingMinutes(text: string): number {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 export function toReadableText(html: string | undefined): string {
   if (!html) {
     return '';

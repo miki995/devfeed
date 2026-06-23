@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
 import { FeedGlobalStateService } from '../core/feed.state';
+import { ReleaseNotificationService } from '../core/notify.service';
 import { categoryLabel } from '../core/categories';
 import { TimeAgoPipe } from './time-ago.pipe';
 import type { Category } from '@shared/index';
@@ -33,6 +34,45 @@ interface SourceGroup {
         <h3>Sources</h3>
         <button type="button" class="x" aria-label="Close" (click)="close.emit()">✕</button>
       </header>
+
+      <div class="tools">
+        <div class="muted">
+          <label class="field">
+            <span class="field-label">Mute keywords</span>
+            <input
+              #keywordInput
+              type="text"
+              placeholder="e.g. crypto, web3 — press Enter"
+              (keydown.enter)="addKeyword(keywordInput)"
+            />
+          </label>
+          @if (state.mutedKeywords().length) {
+            <div class="chips">
+              @for (keyword of state.mutedKeywords(); track keyword) {
+                <button type="button" class="chip" (click)="state.removeMutedKeyword(keyword)">{{ keyword }} ✕</button>
+              }
+            </div>
+          }
+        </div>
+        <div class="backup">
+          <button type="button" class="tool-btn" (click)="exportData()">Export data</button>
+          <label class="tool-btn">
+            Import
+            <input type="file" accept="application/json" hidden (change)="importData($event)" />
+          </label>
+          @if (importStatus()) {
+            <span class="import-status">{{ importStatus() }}</span>
+          }
+        </div>
+        <div class="backup">
+          @if (notify.permission() === 'granted') {
+            <span class="import-status">Release alerts on</span>
+          } @else {
+            <button type="button" class="tool-btn" (click)="notify.enable()">Enable release alerts</button>
+          }
+        </div>
+      </div>
+
       <div class="groups">
         @for (group of groups(); track group.category) {
           <div class="group">
@@ -95,6 +135,74 @@ interface SourceGroup {
         font-size: 16px;
         cursor: pointer;
       }
+      .tools {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+      .field {
+        display: block;
+      }
+      .field-label {
+        display: block;
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 7px;
+      }
+      .field input {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 9px 12px;
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 13px;
+        outline: none;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 10px;
+      }
+      .chip {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--ground);
+        background: var(--accent);
+        border: 0;
+        border-radius: 16px;
+        padding: 4px 10px;
+        cursor: pointer;
+      }
+      .backup {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .tool-btn {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 7px 12px;
+        cursor: pointer;
+      }
+      .tool-btn:hover {
+        color: var(--text);
+        border-color: var(--faint);
+      }
+      .import-status {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--accent);
+      }
       .groups {
         overflow-y: auto;
         padding: 12px 20px 40px;
@@ -148,7 +256,36 @@ interface SourceGroup {
 })
 export class SourcesPanelComponent {
   readonly state = inject(FeedGlobalStateService);
+  readonly notify = inject(ReleaseNotificationService);
   readonly close = output<void>();
+  readonly importStatus = signal<string>('');
+
+  addKeyword(input: HTMLInputElement): void {
+    this.state.addMutedKeyword(input.value);
+    input.value = '';
+  }
+
+  exportData(): void {
+    const blob = new Blob([this.state.exportData()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'devfeed-backup.json';
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
+  importData(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) {
+      return;
+    }
+    file.text().then((text) => {
+      const ok = this.state.importData(text);
+      this.importStatus.set(ok ? 'Imported' : 'Invalid file');
+      setTimeout(() => this.importStatus.set(''), 2000);
+    });
+  }
 
   readonly groups = computed<SourceGroup[]>(() => {
     const disabled = new Set(this.state.disabledSourceIds());

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
@@ -12,6 +12,7 @@ import { TimeAgoPipe } from './time-ago.pipe';
   selector: 'df-reader',
   imports: [RouterLink, TimeAgoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(window:scroll)': 'onScroll()' },
   template: `
     <article class="reader">
       <a class="back" routerLink="/">← Back to feed</a>
@@ -21,8 +22,16 @@ import { TimeAgoPipe } from './time-ago.pipe';
           <span class="tag">{{ label() }}</span>
           <span class="src">{{ current.sourceName }}</span>
           <span class="time">{{ current.publishedAt | timeAgo }}</span>
+          @if (current.readMinutes) {
+            <span class="read-time">{{ current.readMinutes }} min read</span>
+          }
+          <button type="button" class="share" (click)="share(current.url, current.title)">{{ shareLabel() }}</button>
         </div>
         <h1>{{ current.title }}</h1>
+
+        @if (current.aiSummary) {
+          <p class="ai"><span class="ai-tag">AI summary</span> {{ current.aiSummary }}</p>
+        }
 
         @if (content(); as body) {
           <div class="content">{{ body }}</div>
@@ -66,6 +75,42 @@ import { TimeAgoPipe } from './time-ago.pipe';
       }
       .tag {
         color: var(--muted);
+      }
+      .read-time {
+        color: var(--faint);
+      }
+      .share {
+        margin-left: auto;
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .share:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .ai {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text);
+        margin: 0 0 24px;
+      }
+      .ai-tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--accent);
+        margin-right: 8px;
       }
       h1 {
         font-family: var(--serif);
@@ -133,13 +178,47 @@ export class ReaderComponent {
 
   readonly loaded = computed(() => this.contentState().loaded);
   readonly content = computed(() => this.contentState().content);
+  readonly shareLabel = signal<string>('Share');
 
   constructor() {
     effect(() => {
       const id = this.articleId();
       if (id) {
-        this.state.markRead(id);
+        this.state.openArticle(id);
       }
     });
+
+    effect(() => {
+      const id = this.articleId();
+      const ready = this.loaded() || !!this.content();
+      if (id && ready) {
+        const target = this.state.getScroll(id);
+        if (target > 0) {
+          requestAnimationFrame(() => window.scrollTo(0, target));
+        }
+      }
+    });
+  }
+
+  onScroll(): void {
+    const id = this.articleId();
+    if (id) {
+      this.state.setScroll(id, window.scrollY);
+    }
+  }
+
+  share(url: string, title: string): void {
+    const nav = navigator as Navigator & { share?: (data: { title: string; url: string }) => Promise<void> };
+    if (nav.share) {
+      nav.share({ title, url }).catch(() => undefined);
+      return;
+    }
+    navigator.clipboard?.writeText(url).then(
+      () => {
+        this.shareLabel.set('Copied!');
+        setTimeout(() => this.shareLabel.set('Share'), 1500);
+      },
+      () => undefined,
+    );
   }
 }

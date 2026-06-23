@@ -11,6 +11,9 @@ export interface Prefs {
   lastCategory: string;
   lastView: string;
   hideRead: boolean;
+  mutedKeywords: string[];
+  history: string[];
+  scrollPositions: Record<string, number>;
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -23,6 +26,9 @@ export const DEFAULT_PREFS: Prefs = {
   lastCategory: 'all',
   lastView: 'all',
   hideRead: false,
+  mutedKeywords: [],
+  history: [],
+  scrollPositions: {},
 };
 
 const STORAGE_KEY = 'devfeed.prefs';

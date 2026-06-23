@@ -37,6 +37,13 @@ export interface Article {
   comments?: number;
   content?: string;
   hasContent?: boolean;
+  readMinutes?: number;
+  aiSummary?: string;
+}
+
+export interface SearchEntry {
+  id: string;
+  text: string;
 }
 
 export interface ArticleContent {
