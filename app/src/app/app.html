@@ -1,0 +1,23 @@
+<div class="shell">
+  <header class="topbar">
+    <div class="wordmark">
+      <span class="prompt">~/</span><span class="name">devfeed</span><span class="cursor"></span>
+    </div>
+
+    <label class="search">
+      <span class="icon">⌕</span>
+      <input
+        type="search"
+        placeholder="Search headlines, sources, tags…"
+        [value]="state.searchText()"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </label>
+
+    <button type="button" class="theme-btn" (click)="cycleTheme()">◐ {{ themeLabel() }}</button>
+  </header>
+
+  <router-outlet />
+
+  <footer class="footnote">feeds rebuilt every 2h · no backend · open source</footer>
+</div>

@@ -1,0 +1,105 @@
+:root {
+  --ground: #0e1320;
+  --surface: #161d2e;
+  --surface-2: #1c2438;
+  --line: #283149;
+  --text: #e7eaf3;
+  --muted: #8a93a8;
+  --faint: #5a647e;
+  --accent: #f2c14e;
+  --ai-agents: #7c8cff;
+  --ai-integration: #9b8cff;
+  --frontend: #4fa3e0;
+  --angular: #ff6b6b;
+  --react: #61dafb;
+  --vue-svelte: #5fd18a;
+  --backend: #c9d1e0;
+  --spring-boot: #5fd18a;
+  --nestjs: #e1577e;
+  --node: #8cc84b;
+  --javascript: #f2c14e;
+  --typescript: #4fa3e0;
+  --devops: #f59e6b;
+  --medium: #c9d1e0;
+  --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  --serif: 'Iowan Old Style', 'Charter', Georgia, 'Times New Roman', serif;
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='paper'] {
+  --ground: #f3f1ea;
+  --surface: #fbfaf6;
+  --surface-2: #ece8dd;
+  --line: #ddd8c9;
+  --text: #1e2230;
+  --muted: #5c6273;
+  --faint: #97927f;
+  --accent: #c8631b;
+  --backend: #6b7080;
+  --medium: #6b7080;
+}
+
+[data-theme='terminal'] {
+  --ground: #05080a;
+  --surface: #0b1012;
+  --surface-2: #0f1518;
+  --line: #18211f;
+  --text: #c8f2d8;
+  --muted: #5e8a6f;
+  --faint: #3c5a47;
+  --accent: #39ff8b;
+  --ai-agents: #39ff8b;
+  --typescript: #6fe3c0;
+  --javascript: #b6ff6b;
+  --medium: #7fae8e;
+}
+
+[data-theme='grape'] {
+  --ground: #14101f;
+  --surface: #1e182e;
+  --surface-2: #261e3a;
+  --line: #342a4c;
+  --text: #ece7f7;
+  --muted: #9c90b8;
+  --faint: #645680;
+  --accent: #c792ea;
+  --ai-agents: #82aaff;
+  --angular: #ff7eb6;
+  --javascript: #ffcb6b;
+}
+
+[data-theme='ember'] {
+  --ground: #1a1311;
+  --surface: #241a16;
+  --surface-2: #2e211b;
+  --line: #3d2c24;
+  --text: #f5e9e2;
+  --muted: #b59a8c;
+  --faint: #7a6256;
+  --accent: #ff8a4c;
+  --angular: #ff6b5c;
+  --javascript: #ffc15e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
