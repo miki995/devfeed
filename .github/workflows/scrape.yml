@@ -18,6 +18,9 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm --workspace scraper run build:data
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AI_SUMMARY_LIMIT: '40'
       - name: Commit refreshed data
         run: |
           git config user.name "Miroslav Maksimovic"
