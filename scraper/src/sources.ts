@@ -46,4 +46,29 @@ export const SOURCES: Source[] = [
   { id: 'medium-javascript', name: 'Medium — JavaScript', category: 'medium', type: 'rss', url: 'https://medium.com/feed/tag/javascript', enabled: true },
   { id: 'medium-ai', name: 'Medium — AI', category: 'medium', type: 'rss', url: 'https://medium.com/feed/tag/artificial-intelligence', enabled: true },
   { id: 'medium-angular', name: 'Medium — Angular', category: 'medium', type: 'rss', url: 'https://medium.com/feed/tag/angular', enabled: true },
+  { id: 'medium-programming', name: 'Medium — Programming', category: 'medium', type: 'rss', url: 'https://medium.com/feed/tag/programming', enabled: true },
+  { id: 'medium-webdev', name: 'Medium — Web Development', category: 'medium', type: 'rss', url: 'https://medium.com/feed/tag/web-development', enabled: true },
+
+  { id: 'aider-releases', name: 'Aider releases', category: 'ai-agents', type: 'rss', url: 'https://github.com/Aider-AI/aider/releases.atom', enabled: true },
+  { id: 'github-copilot-changelog', name: 'GitHub Changelog', category: 'ai-agents', type: 'rss', url: 'https://github.blog/changelog/feed/', enabled: true },
+  { id: 'google-ai-blog', name: 'Google AI blog', category: 'ai-integration', type: 'rss', url: 'https://blog.google/technology/ai/rss/', enabled: true },
+  { id: 'mistral-news', name: 'Mistral AI', category: 'ai-integration', type: 'rss', url: 'https://mistral.ai/news/feed.xml', enabled: true },
+  { id: 'llamaindex-blog', name: 'LlamaIndex blog', category: 'ai-integration', type: 'rss', url: 'https://www.llamaindex.ai/blog/feed', enabled: true },
+
+  { id: 'css-tricks', name: 'CSS-Tricks', category: 'frontend', type: 'rss', url: 'https://css-tricks.com/feed/', enabled: true },
+  { id: 'smashing-magazine', name: 'Smashing Magazine', category: 'frontend', type: 'rss', url: 'https://www.smashingmagazine.com/feed/', enabled: true },
+  { id: 'astro-blog', name: 'Astro blog', category: 'frontend', type: 'rss', url: 'https://astro.build/rss.xml', enabled: true },
+
+  { id: 'nextjs-releases', name: 'Next.js releases', category: 'react', type: 'rss', url: 'https://github.com/vercel/next.js/releases.atom', enabled: true },
+  { id: 'nuxt-releases', name: 'Nuxt releases', category: 'vue-svelte', type: 'rss', url: 'https://github.com/nuxt/nuxt/releases.atom', enabled: true },
+
+  { id: 'github-engineering', name: 'The GitHub Blog', category: 'backend', type: 'rss', url: 'https://github.blog/feed/', enabled: true },
+  { id: 'stackoverflow-blog', name: 'Stack Overflow blog', category: 'backend', type: 'rss', url: 'https://stackoverflow.blog/feed/', enabled: true },
+  { id: 'go-blog', name: 'The Go Blog', category: 'backend', type: 'rss', url: 'https://go.dev/blog/feed.atom', enabled: true },
+
+  { id: 'deno-blog', name: 'Deno blog', category: 'node', type: 'rss', url: 'https://deno.com/feed', enabled: true },
+  { id: 'bun-releases', name: 'Bun releases', category: 'node', type: 'rss', url: 'https://github.com/oven-sh/bun/releases.atom', enabled: true },
+
+  { id: 'cloudflare-blog', name: 'Cloudflare blog', category: 'devops', type: 'rss', url: 'https://blog.cloudflare.com/rss/', enabled: true },
+  { id: 'hashicorp-blog', name: 'HashiCorp blog', category: 'devops', type: 'rss', url: 'https://www.hashicorp.com/blog/feed.xml', enabled: true },
 ];

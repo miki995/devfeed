@@ -1,4 +1,4 @@
-import { hashUrl, stripHtml, dedupeByUrl, sortByDateDesc, capPerSource } from './normalize';
+import { hashUrl, stripHtml, truncate, summarize, dedupeByUrl, sortByDateDesc, capPerSource } from './normalize';
 import type { Article } from '@shared/index';
 
 const makeArticle = (over: Partial<Article>): Article => ({
@@ -25,6 +25,23 @@ describe('normalize', () => {
 
   it('stripHtml handles undefined', () => {
     expect(stripHtml(undefined)).toBe('');
+  });
+
+  it('truncate leaves short text untouched', () => {
+    expect(truncate('short', 100)).toBe('short');
+  });
+
+  it('truncate clips long text at a word boundary with an ellipsis', () => {
+    const result = truncate('one two three four five six seven', 12);
+    expect(result.endsWith('…')).toBe(true);
+    expect(result.length).toBeLessThanOrEqual(13);
+  });
+
+  it('summarize strips html and caps length', () => {
+    const long = `<p>${'word '.repeat(100)}</p>`;
+    const result = summarize(long);
+    expect(result).not.toContain('<');
+    expect(result.length).toBeLessThanOrEqual(241);
   });
 
   it('dedupeByUrl keeps first occurrence', () => {

@@ -20,6 +20,20 @@ export function stripHtml(html: string | undefined): string {
     .trim();
 }
 
+export function truncate(text: string, maxLength: number): string {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  const clipped = text.slice(0, maxLength);
+  const lastSpace = clipped.lastIndexOf(' ');
+  const base = lastSpace > maxLength * 0.6 ? clipped.slice(0, lastSpace) : clipped;
+  return `${base.trimEnd()}…`;
+}
+
+export function summarize(html: string | undefined): string {
+  return truncate(stripHtml(html), 240);
+}
+
 export function dedupeByUrl(articles: Article[]): Article[] {
   const seen = new Set<string>();
   const result: Article[] = [];

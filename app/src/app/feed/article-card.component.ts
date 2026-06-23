@@ -28,6 +28,9 @@ import { TimeAgoPipe } from './time-ago.pipe';
         @if (article().summary) {
           <p class="summary">{{ article().summary }}</p>
         }
+        <a class="read" [href]="article().url" target="_blank" rel="noopener" (click)="markRead.emit(article().id)">
+          Read at {{ article().sourceName }} ↗
+        </a>
       </div>
       <div class="side">
         @if (article().points !== undefined) {
@@ -116,7 +119,21 @@ import { TimeAgoPipe } from './time-ago.pipe';
         color: var(--muted);
         font-size: 14px;
         line-height: 1.55;
-        max-width: 64ch;
+        max-width: 70ch;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .read {
+        display: inline-block;
+        margin-top: 9px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--accent);
+      }
+      .read:hover {
+        text-decoration: underline;
       }
       .side {
         display: flex;

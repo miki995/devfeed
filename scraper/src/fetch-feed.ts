@@ -1,6 +1,6 @@
 import RssParser from 'rss-parser';
 import type { Article, Source } from '@shared/index';
-import { hashUrl, stripHtml } from './normalize';
+import { hashUrl, summarize } from './normalize';
 
 const rssParser = new RssParser({ timeout: 15000 });
 
@@ -55,7 +55,7 @@ export function parseDevto(source: Source, items: DevtoItem[]): Article[] {
       id: hashUrl(item.url),
       title: item.title,
       url: item.url,
-      summary: stripHtml(item.description),
+      summary: summarize(item.description),
       sourceId: source.id,
       sourceName: source.name,
       category: source.category,
@@ -72,7 +72,7 @@ export function parseRssItems(source: Source, items: RssItem[]): Article[] {
       id: hashUrl(item.link as string),
       title: item.title as string,
       url: item.link as string,
-      summary: stripHtml(item.contentSnippet ?? item.content),
+      summary: summarize(item.contentSnippet ?? item.content),
       sourceId: source.id,
       sourceName: source.name,
       category: source.category,
