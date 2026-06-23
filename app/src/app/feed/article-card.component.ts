@@ -16,6 +16,9 @@ import { TimeAgoPipe } from './time-ago.pipe';
             <span class="dot" [style.background]="colorVar()"></span>
             {{ label() }}
           </span>
+          @if (isNew()) {
+            <span class="new">NEW</span>
+          }
           <span class="src">{{ article().sourceName }}</span>
           <span class="time">{{ article().publishedAt | timeAgo }}</span>
         </div>
@@ -80,6 +83,16 @@ import { TimeAgoPipe } from './time-ago.pipe';
         height: 7px;
         border-radius: 2px;
       }
+      .new {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--ground);
+        background: var(--accent);
+        border-radius: 4px;
+        padding: 1px 5px;
+      }
       .src {
         color: var(--faint);
       }
@@ -137,6 +150,7 @@ export class ArticleCardComponent {
   readonly article = input.required<Article>();
   readonly saved = input<boolean>(false);
   readonly isRead = input<boolean>(false);
+  readonly isNew = input<boolean>(false);
   readonly save = output<string>();
   readonly markRead = output<string>();
 

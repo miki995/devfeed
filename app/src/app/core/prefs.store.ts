@@ -7,6 +7,7 @@ export interface Prefs {
   savedArticleIds: string[];
   readArticleIds: string[];
   theme: string;
+  lastVisitAt: string;
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -15,6 +16,7 @@ export const DEFAULT_PREFS: Prefs = {
   savedArticleIds: [],
   readArticleIds: [],
   theme: 'midnight',
+  lastVisitAt: '',
 };
 
 const STORAGE_KEY = 'devfeed.prefs';

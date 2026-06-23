@@ -6,6 +6,7 @@ import type { Article, Category, Source } from '@shared/index';
 import { FeedApiService } from './feed.api';
 import { filterArticles } from './filter';
 import { pickReleases } from './releases';
+import { dedupeSimilar } from './dedupe';
 import { loadPrefs, savePrefs, Prefs } from './prefs.store';
 
 export type FeedView = 'all' | 'saved';
@@ -22,10 +23,16 @@ const EMPTY_STATE: FeedState = { loading: true, articles: [], sources: [] };
 export class FeedGlobalStateService {
   private readonly api = inject(FeedApiService);
   private readonly prefs = signal<Prefs>(loadPrefs());
+  private readonly previousVisitAt: string;
 
   readonly selectedCategory = signal<Category | 'all'>('all');
   readonly searchText = signal<string>('');
   readonly view = signal<FeedView>('all');
+
+  constructor() {
+    this.previousVisitAt = this.prefs().lastVisitAt;
+    this.commit({ ...this.prefs(), lastVisitAt: new Date().toISOString() });
+  }
 
   private readonly feedState = toSignal(
     this.api.getFeed().pipe(
@@ -37,7 +44,7 @@ export class FeedGlobalStateService {
   );
 
   readonly loading: Signal<boolean> = computed(() => this.feedState().loading);
-  readonly articles: Signal<Article[]> = computed(() => this.feedState().articles);
+  readonly articles: Signal<Article[]> = computed(() => dedupeSimilar(this.feedState().articles));
   readonly sources: Signal<Source[]> = computed(() => this.feedState().sources);
   readonly disabledSourceIds: Signal<string[]> = computed(() => this.prefs().disabledSourceIds);
   readonly savedArticleIds: Signal<string[]> = computed(() => this.prefs().savedArticleIds);
@@ -57,6 +64,19 @@ export class FeedGlobalStateService {
   readonly latestReleases: Signal<Article[]> = computed(() => pickReleases(this.articles(), 6));
 
   readonly savedCount: Signal<number> = computed(() => this.savedArticleIds().length);
+
+  readonly newArticleIds: Signal<Set<string>> = computed(() => {
+    if (!this.previousVisitAt) {
+      return new Set<string>();
+    }
+    const threshold = new Date(this.previousVisitAt).getTime();
+    const ids = this.articles()
+      .filter((article) => new Date(article.publishedAt).getTime() > threshold)
+      .map((article) => article.id);
+    return new Set(ids);
+  });
+
+  readonly newCount: Signal<number> = computed(() => this.newArticleIds().size);
 
   readonly countByCategory: Signal<Map<Category, number>> = computed(() => {
     const counts = new Map<Category, number>();

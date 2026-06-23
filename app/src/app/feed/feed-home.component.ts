@@ -24,7 +24,12 @@ import { ReleaseTickerComponent } from './release-ticker.component';
       <main class="feed-col">
         <div class="feed-head">
           <div class="views">
-            <button type="button" [class.active]="state.view() === 'all'" (click)="state.setView('all')">Latest</button>
+            <button type="button" [class.active]="state.view() === 'all'" (click)="state.setView('all')">
+              Latest
+              @if (state.newCount()) {
+                <span class="badge">{{ state.newCount() }} new</span>
+              }
+            </button>
             <button type="button" [class.active]="state.view() === 'saved'" (click)="state.setView('saved')">
               Saved
               @if (state.savedCount()) {
@@ -43,6 +48,7 @@ import { ReleaseTickerComponent } from './release-ticker.component';
               [article]="article"
               [saved]="savedIds().has(article.id)"
               [isRead]="readIds().has(article.id)"
+              [isNew]="state.newArticleIds().has(article.id)"
               (save)="state.toggleSaved($event)"
               (markRead)="state.markRead($event)"
             />
