@@ -80,6 +80,10 @@ interface Channel {
           overflow-x: auto;
           gap: 8px;
           padding-bottom: 4px;
+          scrollbar-width: none;
+        }
+        .rail::-webkit-scrollbar {
+          display: none;
         }
         h3 {
           display: none;

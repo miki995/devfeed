@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm install
       - run: npm --workspace app run build -- --base-href /devfeed/
       - run: cp app/dist/app/browser/index.html app/dist/app/browser/404.html

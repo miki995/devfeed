@@ -17,6 +17,7 @@
 
     <button type="button" class="ghost-btn" (click)="toggleSources(true)">⚙ Sources</button>
     <button type="button" class="ghost-btn" (click)="cycleTheme()">◐ {{ themeLabel() }}</button>
+    <button type="button" class="ghost-btn" aria-label="Keyboard shortcuts" (click)="toggleHelp(true)">?</button>
   </header>
 
   <router-outlet />
@@ -26,4 +27,22 @@
 
 @if (sourcesOpen()) {
   <df-sources-panel (close)="toggleSources(false)" />
+}
+
+@if (helpOpen()) {
+  <div class="help-backdrop" (click)="toggleHelp(false)"></div>
+  <div class="help" role="dialog" aria-label="Keyboard shortcuts">
+    <header>
+      <h3>Keyboard shortcuts</h3>
+      <button type="button" class="x" aria-label="Close" (click)="toggleHelp(false)">✕</button>
+    </header>
+    <ul>
+      <li><kbd>/</kbd><span>Focus search</span></li>
+      <li><kbd>[</kbd> <kbd>]</kbd><span>Previous / next channel</span></li>
+      <li><kbd>s</kbd><span>Toggle saved view</span></li>
+      <li><kbd>t</kbd><span>Cycle theme</span></li>
+      <li><kbd>?</kbd><span>Show this help</span></li>
+      <li><kbd>Esc</kbd><span>Close dialogs / blur search</span></li>
+    </ul>
+  </div>
 }

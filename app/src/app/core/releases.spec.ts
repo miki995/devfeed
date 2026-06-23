@@ -29,4 +29,14 @@ describe('releases', () => {
     const result = pickReleases(articles, 2);
     expect(result.map((item) => item.id)).toEqual(['1', '3']);
   });
+
+  it('keeps only the newest entry per release source', () => {
+    const articles = [
+      article('1', 'claude-code-releases'),
+      article('2', 'claude-code-releases'),
+      article('3', 'node-releases'),
+    ];
+    const result = pickReleases(articles, 6);
+    expect(result.map((item) => item.id)).toEqual(['1', '3']);
+  });
 });

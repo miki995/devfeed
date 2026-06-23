@@ -80,8 +80,14 @@ interface ReleaseView {
         padding: 0 20px;
         overflow-x: auto;
         flex: 1;
+        min-width: 0;
         font-family: var(--mono);
         font-size: 13px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .track::-webkit-scrollbar {
+        display: none;
       }
       .rel {
         display: flex;

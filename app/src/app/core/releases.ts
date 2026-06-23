@@ -5,5 +5,17 @@ export function isReleaseSourceId(sourceId: string): boolean {
 }
 
 export function pickReleases(articles: Article[], max: number): Article[] {
-  return articles.filter((article) => isReleaseSourceId(article.sourceId)).slice(0, max);
+  const seenSources = new Set<string>();
+  const result: Article[] = [];
+  for (const article of articles) {
+    if (!isReleaseSourceId(article.sourceId) || seenSources.has(article.sourceId)) {
+      continue;
+    }
+    seenSources.add(article.sourceId);
+    result.push(article);
+    if (result.length === max) {
+      break;
+    }
+  }
+  return result;
 }

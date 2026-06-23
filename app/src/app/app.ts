@@ -29,10 +29,15 @@ export class App {
   protected readonly state = inject(FeedGlobalStateService);
   protected readonly themeLabel = computed(() => THEMES.find((theme) => theme.id === this.state.theme())?.label ?? 'Midnight');
   protected readonly sourcesOpen = signal<boolean>(false);
+  protected readonly helpOpen = signal<boolean>(false);
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
   protected toggleSources(open: boolean): void {
     this.sourcesOpen.set(open);
+  }
+
+  protected toggleHelp(open: boolean): void {
+    this.helpOpen.set(open);
   }
 
   protected onKeydown(event: KeyboardEvent): void {
@@ -40,7 +45,9 @@ export class App {
     const typing = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA';
 
     if (event.key === 'Escape') {
-      if (this.sourcesOpen()) {
+      if (this.helpOpen()) {
+        this.helpOpen.set(false);
+      } else if (this.sourcesOpen()) {
         this.sourcesOpen.set(false);
       } else if (typing) {
         this.searchInput()?.nativeElement.blur();
@@ -71,6 +78,10 @@ export class App {
     }
     if (event.key === 't') {
       this.cycleTheme();
+      return;
+    }
+    if (event.key === '?') {
+      this.helpOpen.update((open) => !open);
     }
   }
 
