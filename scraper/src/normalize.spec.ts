@@ -1,4 +1,4 @@
-import { hashUrl, stripHtml, truncate, summarize, dedupeByUrl, sortByDateDesc, capPerSource } from './normalize';
+import { hashUrl, stripHtml, truncate, summarize, toReadableText, dedupeByUrl, sortByDateDesc, capPerSource } from './normalize';
 import type { Article } from '@shared/index';
 
 const makeArticle = (over: Partial<Article>): Article => ({
@@ -35,6 +35,19 @@ describe('normalize', () => {
     const result = truncate('one two three four five six seven', 12);
     expect(result.endsWith('…')).toBe(true);
     expect(result.length).toBeLessThanOrEqual(13);
+  });
+
+  it('toReadableText keeps paragraph breaks and bullets', () => {
+    const html = '<h2>Title</h2><p>First para.</p><ul><li>one</li><li>two</li></ul>';
+    const result = toReadableText(html);
+    expect(result).toContain('First para.');
+    expect(result).toContain('• one');
+    expect(result).toContain('\n');
+    expect(result).not.toContain('<');
+  });
+
+  it('toReadableText returns empty for missing input', () => {
+    expect(toReadableText(undefined)).toBe('');
   });
 
   it('summarize strips html and caps length', () => {

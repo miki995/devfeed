@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import type { Article } from '@shared/index';
 import { categoryLabel } from '../core/categories';
 import { TimeAgoPipe } from './time-ago.pipe';
 
 @Component({
   selector: 'df-article-card',
-  imports: [TimeAgoPipe],
+  imports: [TimeAgoPipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article class="card" [class.is-read]="isRead()">
@@ -22,15 +23,13 @@ import { TimeAgoPipe } from './time-ago.pipe';
           <span class="src">{{ article().sourceName }}</span>
           <span class="time">{{ article().publishedAt | timeAgo }}</span>
         </div>
-        <a class="title" [href]="article().url" target="_blank" rel="noopener" (click)="markRead.emit(article().id)">
+        <a class="title" [routerLink]="['/read', article().id]">
           {{ article().title }}
         </a>
         @if (article().summary) {
           <p class="summary">{{ article().summary }}</p>
         }
-        <a class="read" [href]="article().url" target="_blank" rel="noopener" (click)="markRead.emit(article().id)">
-          Read at {{ article().sourceName }} ↗
-        </a>
+        <a class="read" [routerLink]="['/read', article().id]">Read →</a>
       </div>
       <div class="side">
         @if (article().points !== undefined) {
@@ -169,7 +168,6 @@ export class ArticleCardComponent {
   readonly isRead = input<boolean>(false);
   readonly isNew = input<boolean>(false);
   readonly save = output<string>();
-  readonly markRead = output<string>();
 
   readonly label = computed(() => categoryLabel(this.article().category));
   readonly colorVar = computed(() => `var(--${this.article().category})`);

@@ -34,6 +34,27 @@ export function summarize(html: string | undefined): string {
   return truncate(stripHtml(html), 240);
 }
 
+export function toReadableText(html: string | undefined): string {
+  if (!html) {
+    return '';
+  }
+  return html
+    .replace(/<\s*(br|\/p|\/div|\/h[1-6]|\/li|\/tr)\s*\/?>/gi, '\n')
+    .replace(/<\s*li[^>]*>/gi, '\n• ')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+    .slice(0, 12000);
+}
+
 export function dedupeByUrl(articles: Article[]): Article[] {
   const seen = new Set<string>();
   const result: Article[] = [];

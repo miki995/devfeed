@@ -1,0 +1,1 @@
+{"id":"af6d65fea50b","content":"v11.1.22 (2026-05-21)\n\nBug fixes\n\n• core\n\n• #16993 fix(core): inflight request injection bug #16989 (@kamilmysliwiec)\n\nEnhancements\n\n• core\n\n• #16967 fix(core): identify decorator type in invalid-class-module error (@HarrierOnChain)\n\n•\n\nCommitters: 2\n\n• Harrier (@HarrierOnChain)\n\n• Kamil Mysliwiec (@kamilmysliwiec)"}

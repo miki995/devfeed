@@ -68,7 +68,6 @@ import { TimeAgoPipe } from './time-ago.pipe';
               [isRead]="readIds().has(article.id)"
               [isNew]="state.newArticleIds().has(article.id)"
               (save)="state.toggleSaved($event)"
-              (markRead)="state.markRead($event)"
             />
           } @empty {
             @if (state.view() === 'saved') {

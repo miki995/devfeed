@@ -1,6 +1,6 @@
 import RssParser from 'rss-parser';
 import type { Article, Source } from '@shared/index';
-import { hashUrl, summarize } from './normalize';
+import { hashUrl, summarize, toReadableText } from './normalize';
 
 const rssParser = new RssParser({ timeout: 15000 });
 
@@ -27,8 +27,19 @@ interface RssItem {
   link?: string;
   contentSnippet?: string;
   content?: string;
+  'content:encoded'?: string;
   isoDate?: string;
   pubDate?: string;
+}
+
+const MIN_CONTENT_LENGTH = 280;
+
+function buildContent(html: string | undefined): { content?: string; hasContent: boolean } {
+  const readable = toReadableText(html);
+  if (readable.length >= MIN_CONTENT_LENGTH) {
+    return { content: readable, hasContent: true };
+  }
+  return { hasContent: false };
 }
 
 export function parseHackerNews(source: Source, payload: { hits: HackerNewsHit[] }): Article[] {
@@ -68,16 +79,22 @@ export function parseDevto(source: Source, items: DevtoItem[]): Article[] {
 export function parseRssItems(source: Source, items: RssItem[]): Article[] {
   return (items ?? [])
     .filter((item) => !!item.link && !!item.title)
-    .map((item) => ({
-      id: hashUrl(item.link as string),
-      title: item.title as string,
-      url: item.link as string,
-      summary: summarize(item.contentSnippet ?? item.content),
-      sourceId: source.id,
-      sourceName: source.name,
-      category: source.category,
-      publishedAt: item.isoDate ?? item.pubDate ?? new Date(0).toISOString(),
-    }));
+    .map((item) => {
+      const fullHtml = item['content:encoded'] ?? item.content;
+      const { content, hasContent } = buildContent(fullHtml);
+      return {
+        id: hashUrl(item.link as string),
+        title: item.title as string,
+        url: item.link as string,
+        summary: summarize(item.contentSnippet ?? item.content),
+        sourceId: source.id,
+        sourceName: source.name,
+        category: source.category,
+        publishedAt: item.isoDate ?? item.pubDate ?? new Date(0).toISOString(),
+        content,
+        hasContent,
+      };
+    });
 }
 
 async function fetchJson(url: string): Promise<unknown> {

@@ -1,0 +1,1 @@
+{"id":"56bb2c490625","content":"Patch Changes\n\n•\nfix: properly track effect end node for async sibling component (#18371)\n\n•\nfix: prevent false-positive reactivity loss warning (#18373)\n\n•\nchore: bump esrap dependency (#18372)\n\n•\nfix: ignore declaration tags for animation directive (#18366)\n\n•\nfix: reject pending async deriveds on discard (#18308)"}

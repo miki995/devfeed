@@ -35,6 +35,13 @@ export interface Article {
   publishedAt: string;
   points?: number;
   comments?: number;
+  content?: string;
+  hasContent?: boolean;
+}
+
+export interface ArticleContent {
+  id: string;
+  content: string;
 }
 
 export interface FeedBundle {

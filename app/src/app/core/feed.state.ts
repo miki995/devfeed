@@ -98,6 +98,14 @@ export class FeedGlobalStateService {
 
   readonly newCount: Signal<number> = computed(() => this.newArticleIds().size);
 
+  readonly articlesById: Signal<Map<string, Article>> = computed(() => {
+    const byId = new Map<string, Article>();
+    for (const article of this.articles()) {
+      byId.set(article.id, article);
+    }
+    return byId;
+  });
+
   readonly countByCategory: Signal<Map<Category, number>> = computed(() => {
     const counts = new Map<Category, number>();
     for (const article of this.articles()) {

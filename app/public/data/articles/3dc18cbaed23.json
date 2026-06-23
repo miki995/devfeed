@@ -1,0 +1,1 @@
+{"id":"3dc18cbaed23","content":"v11.1.19 (2026-04-13)\n\nBug fixes\n\n• microservices\n\n• #16762 fix(microservices): use backing field for consumer CRASH event listener (@burhanharoon)\n\n• #16764 fix(microservices): prevent stack overflow in jsonsocket.handledata() (@kamilmysliwiec)\n\nCommitters: 2\n\n• Burhan Haroon⚡ (@burhanharoon)\n\n• Kamil Mysliwiec (@kamilmysliwiec)"}
