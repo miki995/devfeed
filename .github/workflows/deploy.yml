@@ -27,7 +27,10 @@ jobs:
           node-version: 20
       - run: npm install
       - run: npm --workspace app run build -- --base-href /devfeed/
+      - run: cp app/dist/app/browser/index.html app/dist/app/browser/404.html
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: app/dist/app/browser
