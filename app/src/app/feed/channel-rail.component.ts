@@ -74,6 +74,26 @@ interface Channel {
         font-size: 11.5px;
         color: var(--faint);
       }
+      @media (max-width: 860px) {
+        .rail {
+          flex-direction: row;
+          overflow-x: auto;
+          gap: 8px;
+          padding-bottom: 4px;
+        }
+        h3 {
+          display: none;
+        }
+        .channel {
+          width: auto;
+          flex: none;
+          border: 1px solid var(--line);
+          padding: 7px 12px;
+        }
+        .channel .count {
+          display: none;
+        }
+      }
     `,
   ],
 })

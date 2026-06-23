@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FeedGlobalStateService } from './core/feed.state';
+import { cycleChannel } from './core/navigation';
 import { SourcesPanelComponent } from './feed/sources-panel.component';
 
 interface ThemeOption {
@@ -22,14 +23,55 @@ const THEMES: ThemeOption[] = [
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(document:keydown)': 'onKeydown($event)' },
 })
 export class App {
   protected readonly state = inject(FeedGlobalStateService);
   protected readonly themeLabel = computed(() => THEMES.find((theme) => theme.id === this.state.theme())?.label ?? 'Midnight');
   protected readonly sourcesOpen = signal<boolean>(false);
+  private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
   protected toggleSources(open: boolean): void {
     this.sourcesOpen.set(open);
+  }
+
+  protected onKeydown(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    const typing = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA';
+
+    if (event.key === 'Escape') {
+      if (this.sourcesOpen()) {
+        this.sourcesOpen.set(false);
+      } else if (typing) {
+        this.searchInput()?.nativeElement.blur();
+      }
+      return;
+    }
+
+    if (typing || event.metaKey || event.ctrlKey || event.altKey) {
+      return;
+    }
+
+    if (event.key === '/') {
+      event.preventDefault();
+      this.searchInput()?.nativeElement.focus();
+      return;
+    }
+    if (event.key === ']') {
+      this.state.setCategory(cycleChannel(this.state.selectedCategory(), 1));
+      return;
+    }
+    if (event.key === '[') {
+      this.state.setCategory(cycleChannel(this.state.selectedCategory(), -1));
+      return;
+    }
+    if (event.key === 's') {
+      this.state.setView(this.state.view() === 'saved' ? 'all' : 'saved');
+      return;
+    }
+    if (event.key === 't') {
+      this.cycleTheme();
+    }
   }
 
   constructor() {

@@ -7,8 +7,9 @@
     <label class="search">
       <span class="icon">⌕</span>
       <input
+        #searchInput
         type="search"
-        placeholder="Search headlines, sources, tags…"
+        placeholder="Search headlines, sources, tags…   ( / )"
         [value]="state.searchText()"
         (input)="onSearch($any($event.target).value)"
       />

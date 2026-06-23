@@ -115,7 +115,13 @@ import { ReleaseTickerComponent } from './release-ticker.component';
           grid-template-columns: 1fr;
         }
         .rail-col {
-          display: none;
+          position: sticky;
+          top: 78px;
+          z-index: 4;
+          background: var(--ground);
+          margin: 0 -24px;
+          padding: 6px 24px 10px;
+          border-bottom: 1px solid var(--line);
         }
       }
     `,
