@@ -1,0 +1,1 @@
+{"id":"9c8be1fd3af6","content":"This release includes a fix for an unexpected behavior introduced\n\nby the recent security release (22.23.0).\n\nCommits\n\n• [41d2ee13be] - build: switch coverage-windows to windows-2022 (Richard Lau) #63940\n\n• [eaa292549e] - http: avoid stream listeners on idle agent sockets (Matteo Collina) #64004"}

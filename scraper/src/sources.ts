@@ -14,7 +14,7 @@ export const SOURCES: Source[] = [
 
   { id: 'claude-code-releases', name: 'Claude Code releases', category: 'ai-agents', type: 'rss', url: 'https://github.com/anthropics/claude-code/releases.atom', enabled: true },
   { id: 'cursor-changelog', name: 'Cursor changelog', category: 'ai-agents', type: 'rss', url: 'https://www.cursor.com/changelog/rss.xml', enabled: true },
-  { id: 'anthropic-news', name: 'Anthropic news', category: 'ai-agents', type: 'rss', url: 'https://www.anthropic.com/news/rss.xml', enabled: true },
+  { id: 'anthropic-news', name: 'Anthropic news', category: 'ai-agents', type: 'rss', url: 'https://www.anthropic.com/news/rss.xml', enabled: false },
   { id: 'openai-blog', name: 'OpenAI blog', category: 'ai-integration', type: 'rss', url: 'https://openai.com/blog/rss.xml', enabled: true },
   { id: 'huggingface-blog', name: 'Hugging Face blog', category: 'ai-integration', type: 'rss', url: 'https://huggingface.co/blog/feed.xml', enabled: true },
   { id: 'langchain-blog', name: 'LangChain blog', category: 'ai-integration', type: 'rss', url: 'https://blog.langchain.dev/rss/', enabled: true },
