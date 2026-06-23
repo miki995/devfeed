@@ -1,0 +1,27 @@
+name: scrape
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm --workspace scraper run build:data
+      - name: Commit refreshed data
+        run: |
+          git config user.name "Miroslav Maksimovic"
+          git config user.email "miroslav@hivecpq.com"
+          git add app/public/data
+          git commit -m "Refresh feed data" || echo "nothing to commit"
+          git push
