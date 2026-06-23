@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FeedGlobalStateService } from './core/feed.state';
+import { SourcesPanelComponent } from './feed/sources-panel.component';
 
 interface ThemeOption {
   id: string;
@@ -17,7 +18,7 @@ const THEMES: ThemeOption[] = [
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, SourcesPanelComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +26,11 @@ const THEMES: ThemeOption[] = [
 export class App {
   protected readonly state = inject(FeedGlobalStateService);
   protected readonly themeLabel = computed(() => THEMES.find((theme) => theme.id === this.state.theme())?.label ?? 'Midnight');
+  protected readonly sourcesOpen = signal<boolean>(false);
+
+  protected toggleSources(open: boolean): void {
+    this.sourcesOpen.set(open);
+  }
 
   constructor() {
     effect(() => {

@@ -5,7 +5,10 @@ import { of } from 'rxjs';
 import type { Article, Category, Source } from '@shared/index';
 import { FeedApiService } from './feed.api';
 import { filterArticles } from './filter';
+import { pickReleases } from './releases';
 import { loadPrefs, savePrefs, Prefs } from './prefs.store';
+
+export type FeedView = 'all' | 'saved';
 
 interface FeedState {
   loading: boolean;
@@ -22,6 +25,7 @@ export class FeedGlobalStateService {
 
   readonly selectedCategory = signal<Category | 'all'>('all');
   readonly searchText = signal<string>('');
+  readonly view = signal<FeedView>('all');
 
   private readonly feedState = toSignal(
     this.api.getFeed().pipe(
@@ -45,8 +49,14 @@ export class FeedGlobalStateService {
       category: this.selectedCategory(),
       search: this.searchText(),
       disabledSourceIds: this.disabledSourceIds(),
+      onlySaved: this.view() === 'saved',
+      savedArticleIds: this.savedArticleIds(),
     }),
   );
+
+  readonly latestReleases: Signal<Article[]> = computed(() => pickReleases(this.articles(), 6));
+
+  readonly savedCount: Signal<number> = computed(() => this.savedArticleIds().length);
 
   readonly countByCategory: Signal<Map<Category, number>> = computed(() => {
     const counts = new Map<Category, number>();
@@ -62,6 +72,14 @@ export class FeedGlobalStateService {
 
   setSearch(text: string): void {
     this.searchText.set(text);
+  }
+
+  setView(view: FeedView): void {
+    this.view.set(view);
+  }
+
+  isSourceEnabled(sourceId: string): boolean {
+    return !this.disabledSourceIds().includes(sourceId);
   }
 
   toggleSource(sourceId: string): void {

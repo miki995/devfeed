@@ -2,12 +2,15 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { FeedGlobalStateService } from '../core/feed.state';
 import { ArticleCardComponent } from './article-card.component';
 import { ChannelRailComponent } from './channel-rail.component';
+import { ReleaseTickerComponent } from './release-ticker.component';
 
 @Component({
   selector: 'df-feed-home',
-  imports: [ArticleCardComponent, ChannelRailComponent],
+  imports: [ArticleCardComponent, ChannelRailComponent, ReleaseTickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <df-release-ticker [releases]="state.latestReleases()" />
+
     <div class="layout">
       <aside class="rail-col">
         <df-channel-rail
@@ -20,7 +23,15 @@ import { ChannelRailComponent } from './channel-rail.component';
 
       <main class="feed-col">
         <div class="feed-head">
-          <h2>Latest</h2>
+          <div class="views">
+            <button type="button" [class.active]="state.view() === 'all'" (click)="state.setView('all')">Latest</button>
+            <button type="button" [class.active]="state.view() === 'saved'" (click)="state.setView('saved')">
+              Saved
+              @if (state.savedCount()) {
+                <span class="badge">{{ state.savedCount() }}</span>
+              }
+            </button>
+          </div>
           <span class="meta">{{ state.visibleArticles().length }} stories</span>
         </div>
 
@@ -52,17 +63,43 @@ import { ChannelRailComponent } from './channel-rail.component';
       }
       .feed-head {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         gap: 14px;
         margin-bottom: 10px;
       }
-      .feed-head h2 {
-        font-family: var(--serif);
+      .views {
+        display: flex;
+        gap: 6px;
+      }
+      .views button {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        font-family: var(--sans);
+        font-size: 14px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .views button.active {
+        background: var(--surface);
+        color: var(--text);
+        border-color: var(--faint);
+      }
+      .badge {
+        font-family: var(--mono);
+        font-size: 11px;
+        background: var(--accent);
+        color: var(--ground);
+        border-radius: 10px;
+        padding: 1px 7px;
         font-weight: 600;
-        font-size: 26px;
-        margin: 0;
       }
       .meta {
+        margin-left: auto;
         font-family: var(--mono);
         font-size: 12px;
         color: var(--faint);

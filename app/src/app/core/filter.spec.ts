@@ -38,4 +38,15 @@ describe('filterArticles', () => {
     const result = filterArticles(articles, { category: 'all', search: '', disabledSourceIds: ['spring-blog'] });
     expect(result.map((item) => item.id)).toEqual(['1', '3']);
   });
+
+  it('keeps only saved articles when onlySaved is set', () => {
+    const result = filterArticles(articles, {
+      category: 'all',
+      search: '',
+      disabledSourceIds: [],
+      onlySaved: true,
+      savedArticleIds: ['2'],
+    });
+    expect(result.map((item) => item.id)).toEqual(['2']);
+  });
 });

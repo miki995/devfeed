@@ -14,10 +14,15 @@
       />
     </label>
 
-    <button type="button" class="theme-btn" (click)="cycleTheme()">◐ {{ themeLabel() }}</button>
+    <button type="button" class="ghost-btn" (click)="toggleSources(true)">⚙ Sources</button>
+    <button type="button" class="ghost-btn" (click)="cycleTheme()">◐ {{ themeLabel() }}</button>
   </header>
 
   <router-outlet />
 
   <footer class="footnote">feeds rebuilt every 2h · no backend · open source</footer>
 </div>
+
+@if (sourcesOpen()) {
+  <df-sources-panel (close)="toggleSources(false)" />
+}
