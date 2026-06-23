@@ -1,0 +1,10 @@
+{
+  "name": "devfeed",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "shared",
+    "scraper",
+    "app"
+  ]
+}

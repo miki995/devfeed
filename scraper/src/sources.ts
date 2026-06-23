@@ -1,0 +1,49 @@
+import type { Source } from '@shared/index';
+
+export const SOURCES: Source[] = [
+  { id: 'hn-frontpage', name: 'Hacker News', category: 'frontend', type: 'hackernews', url: 'https://hn.algolia.com/api/v1/search_by_date?tags=front_page', enabled: true, homepage: 'https://news.ycombinator.com' },
+
+  { id: 'devto-ai', name: 'DEV — AI', category: 'ai-integration', type: 'devto', url: 'https://dev.to/api/articles?tag=ai&per_page=30', enabled: true, homepage: 'https://dev.to/t/ai' },
+  { id: 'devto-webdev', name: 'DEV — Web Dev', category: 'frontend', type: 'devto', url: 'https://dev.to/api/articles?tag=webdev&per_page=30', enabled: true },
+  { id: 'devto-angular', name: 'DEV — Angular', category: 'angular', type: 'devto', url: 'https://dev.to/api/articles?tag=angular&per_page=30', enabled: true },
+  { id: 'devto-react', name: 'DEV — React', category: 'react', type: 'devto', url: 'https://dev.to/api/articles?tag=react&per_page=30', enabled: true },
+  { id: 'devto-node', name: 'DEV — Node', category: 'node', type: 'devto', url: 'https://dev.to/api/articles?tag=node&per_page=30', enabled: true },
+  { id: 'devto-typescript', name: 'DEV — TypeScript', category: 'typescript', type: 'devto', url: 'https://dev.to/api/articles?tag=typescript&per_page=30', enabled: true },
+  { id: 'devto-javascript', name: 'DEV — JavaScript', category: 'javascript', type: 'devto', url: 'https://dev.to/api/articles?tag=javascript&per_page=30', enabled: true },
+  { id: 'devto-devops', name: 'DEV — DevOps', category: 'devops', type: 'devto', url: 'https://dev.to/api/articles?tag=devops&per_page=30', enabled: true },
+
+  { id: 'claude-code-releases', name: 'Claude Code releases', category: 'ai-agents', type: 'rss', url: 'https://github.com/anthropics/claude-code/releases.atom', enabled: true },
+  { id: 'cursor-changelog', name: 'Cursor changelog', category: 'ai-agents', type: 'rss', url: 'https://www.cursor.com/changelog/rss.xml', enabled: true },
+  { id: 'anthropic-news', name: 'Anthropic news', category: 'ai-agents', type: 'rss', url: 'https://www.anthropic.com/news/rss.xml', enabled: true },
+  { id: 'openai-blog', name: 'OpenAI blog', category: 'ai-integration', type: 'rss', url: 'https://openai.com/blog/rss.xml', enabled: true },
+  { id: 'huggingface-blog', name: 'Hugging Face blog', category: 'ai-integration', type: 'rss', url: 'https://huggingface.co/blog/feed.xml', enabled: true },
+  { id: 'langchain-blog', name: 'LangChain blog', category: 'ai-integration', type: 'rss', url: 'https://blog.langchain.dev/rss/', enabled: true },
+
+  { id: 'angular-blog', name: 'Angular blog', category: 'angular', type: 'rss', url: 'https://blog.angular.dev/feed', enabled: true },
+  { id: 'angular-releases', name: 'Angular releases', category: 'angular', type: 'rss', url: 'https://github.com/angular/angular/releases.atom', enabled: true },
+  { id: 'react-releases', name: 'React releases', category: 'react', type: 'rss', url: 'https://github.com/facebook/react/releases.atom', enabled: true },
+  { id: 'vue-releases', name: 'Vue releases', category: 'vue-svelte', type: 'rss', url: 'https://github.com/vuejs/core/releases.atom', enabled: true },
+  { id: 'svelte-releases', name: 'Svelte releases', category: 'vue-svelte', type: 'rss', url: 'https://github.com/sveltejs/svelte/releases.atom', enabled: true },
+  { id: 'webdev-blog', name: 'web.dev', category: 'frontend', type: 'rss', url: 'https://web.dev/static/blog/feed.xml', enabled: true },
+
+  { id: 'spring-blog', name: 'Spring blog', category: 'spring-boot', type: 'rss', url: 'https://spring.io/blog.atom', enabled: true },
+  { id: 'springboot-releases', name: 'Spring Boot releases', category: 'spring-boot', type: 'rss', url: 'https://github.com/spring-projects/spring-boot/releases.atom', enabled: true },
+  { id: 'nestjs-releases', name: 'NestJS releases', category: 'nestjs', type: 'rss', url: 'https://github.com/nestjs/nest/releases.atom', enabled: true },
+  { id: 'node-releases', name: 'Node.js releases', category: 'node', type: 'rss', url: 'https://github.com/nodejs/node/releases.atom', enabled: true },
+  { id: 'ts-releases', name: 'TypeScript releases', category: 'typescript', type: 'rss', url: 'https://github.com/microsoft/TypeScript/releases.atom', enabled: true },
+  { id: 'ts-devblog', name: 'TypeScript dev blog', category: 'typescript', type: 'rss', url: 'https://devblogs.microsoft.com/typescript/feed/', enabled: true },
+
+  { id: 'aws-architecture', name: 'AWS Architecture blog', category: 'devops', type: 'rss', url: 'https://aws.amazon.com/blogs/architecture/feed/', enabled: true },
+  { id: 'kubernetes-blog', name: 'Kubernetes blog', category: 'devops', type: 'rss', url: 'https://kubernetes.io/feed.xml', enabled: true },
+  { id: 'docker-blog', name: 'Docker blog', category: 'devops', type: 'rss', url: 'https://www.docker.com/blog/feed/', enabled: true },
+  { id: 'martinfowler', name: 'martinfowler.com', category: 'backend', type: 'rss', url: 'https://martinfowler.com/feed.atom', enabled: true },
+
+  { id: 'reddit-programming', name: 'r/programming', category: 'backend', type: 'rss', url: 'https://www.reddit.com/r/programming/.rss', enabled: true },
+  { id: 'reddit-webdev', name: 'r/webdev', category: 'frontend', type: 'rss', url: 'https://www.reddit.com/r/webdev/.rss', enabled: true },
+  { id: 'reddit-ml', name: 'r/MachineLearning', category: 'ai-integration', type: 'rss', url: 'https://www.reddit.com/r/MachineLearning/.rss', enabled: true },
+  { id: 'lobsters', name: 'Lobsters', category: 'backend', type: 'rss', url: 'https://lobste.rs/rss', enabled: true },
+
+  { id: 'medium-javascript', name: 'Medium — JavaScript', category: 'medium', type: 'rss', url: 'https://medium.com/feed/tag/javascript', enabled: true },
+  { id: 'medium-ai', name: 'Medium — AI', category: 'medium', type: 'rss', url: 'https://medium.com/feed/tag/artificial-intelligence', enabled: true },
+  { id: 'medium-angular', name: 'Medium — Angular', category: 'medium', type: 'rss', url: 'https://medium.com/feed/tag/angular', enabled: true },
+];

@@ -1,0 +1,49 @@
+import { hashUrl, stripHtml, dedupeByUrl, sortByDateDesc, capPerSource } from './normalize';
+import type { Article } from '@shared/index';
+
+const makeArticle = (over: Partial<Article>): Article => ({
+  id: 'x',
+  title: 't',
+  url: 'https://a.com/1',
+  summary: '',
+  sourceId: 's',
+  sourceName: 'S',
+  category: 'frontend',
+  publishedAt: '2026-01-01T00:00:00Z',
+  ...over,
+});
+
+describe('normalize', () => {
+  it('hashUrl is stable and url-safe', () => {
+    expect(hashUrl('https://a.com/1')).toBe(hashUrl('https://a.com/1'));
+    expect(hashUrl('https://a.com/1')).toMatch(/^[a-z0-9]+$/);
+  });
+
+  it('stripHtml removes tags and decodes basic entities', () => {
+    expect(stripHtml('<p>Hello &amp; <b>world</b></p>')).toBe('Hello & world');
+  });
+
+  it('stripHtml handles undefined', () => {
+    expect(stripHtml(undefined)).toBe('');
+  });
+
+  it('dedupeByUrl keeps first occurrence', () => {
+    const result = dedupeByUrl([makeArticle({ id: '1' }), makeArticle({ id: '2' })]);
+    expect(result.map((article) => article.id)).toEqual(['1']);
+  });
+
+  it('sortByDateDesc orders newest first', () => {
+    const result = sortByDateDesc([
+      makeArticle({ id: 'old', publishedAt: '2025-01-01T00:00:00Z' }),
+      makeArticle({ id: 'new', publishedAt: '2026-06-01T00:00:00Z' }),
+    ]);
+    expect(result[0].id).toBe('new');
+  });
+
+  it('capPerSource limits items per source', () => {
+    const many = Array.from({ length: 5 }, (_unused, index) =>
+      makeArticle({ id: String(index), url: `https://a.com/${index}`, sourceId: 's' }),
+    );
+    expect(capPerSource(many, 2).length).toBe(2);
+  });
+});
