@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith, map, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import type { Article, Category, Source } from '@shared/index';
+import { isCategory } from '@shared/index';
 import { FeedApiService } from './feed.api';
 import { filterArticles } from './filter';
 import { pickReleases } from './releases';
@@ -15,9 +16,10 @@ interface FeedState {
   loading: boolean;
   articles: Article[];
   sources: Source[];
+  generatedAt: string;
 }
 
-const EMPTY_STATE: FeedState = { loading: true, articles: [], sources: [] };
+const EMPTY_STATE: FeedState = { loading: true, articles: [], sources: [], generatedAt: '' };
 
 @Injectable({ providedIn: 'root' })
 export class FeedGlobalStateService {
@@ -30,15 +32,18 @@ export class FeedGlobalStateService {
   readonly view = signal<FeedView>('all');
 
   constructor() {
-    this.previousVisitAt = this.prefs().lastVisitAt;
-    this.commit({ ...this.prefs(), lastVisitAt: new Date().toISOString() });
+    const stored = this.prefs();
+    this.previousVisitAt = stored.lastVisitAt;
+    this.selectedCategory.set(isCategory(stored.lastCategory) ? stored.lastCategory : 'all');
+    this.view.set(stored.lastView === 'saved' ? 'saved' : 'all');
+    this.commit({ ...stored, lastVisitAt: new Date().toISOString() });
   }
 
   private readonly feedState = toSignal(
     this.api.getFeed().pipe(
-      map((bundle) => ({ loading: false, articles: bundle.articles, sources: bundle.sources })),
+      map((bundle) => ({ loading: false, articles: bundle.articles, sources: bundle.sources, generatedAt: bundle.generatedAt })),
       startWith(EMPTY_STATE),
-      catchError(() => of({ loading: false, articles: [], sources: [] } as FeedState)),
+      catchError(() => of(EMPTY_STATE)),
     ),
     { initialValue: EMPTY_STATE },
   );
@@ -46,6 +51,18 @@ export class FeedGlobalStateService {
   readonly loading: Signal<boolean> = computed(() => this.feedState().loading);
   readonly articles: Signal<Article[]> = computed(() => dedupeSimilar(this.feedState().articles));
   readonly sources: Signal<Source[]> = computed(() => this.feedState().sources);
+  readonly generatedAt: Signal<string> = computed(() => this.feedState().generatedAt);
+
+  readonly latestBySource: Signal<Map<string, string>> = computed(() => {
+    const newest = new Map<string, string>();
+    for (const article of this.articles()) {
+      const current = newest.get(article.sourceId);
+      if (!current || new Date(article.publishedAt).getTime() > new Date(current).getTime()) {
+        newest.set(article.sourceId, article.publishedAt);
+      }
+    }
+    return newest;
+  });
   readonly disabledSourceIds: Signal<string[]> = computed(() => this.prefs().disabledSourceIds);
   readonly savedArticleIds: Signal<string[]> = computed(() => this.prefs().savedArticleIds);
   readonly readArticleIds: Signal<string[]> = computed(() => this.prefs().readArticleIds);
@@ -88,6 +105,7 @@ export class FeedGlobalStateService {
 
   setCategory(category: Category | 'all'): void {
     this.selectedCategory.set(category);
+    this.commit({ ...this.prefs(), lastCategory: category });
   }
 
   setSearch(text: string): void {
@@ -96,6 +114,7 @@ export class FeedGlobalStateService {
 
   setView(view: FeedView): void {
     this.view.set(view);
+    this.commit({ ...this.prefs(), lastView: view });
   }
 
   isSourceEnabled(sourceId: string): boolean {

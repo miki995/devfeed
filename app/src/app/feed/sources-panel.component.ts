@@ -1,13 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
 import { FeedGlobalStateService } from '../core/feed.state';
 import { categoryLabel } from '../core/categories';
+import { TimeAgoPipe } from './time-ago.pipe';
 import type { Category } from '@shared/index';
+
+const STALE_DAYS = 30;
 
 interface SourceRow {
   id: string;
   name: string;
   colorVar: string;
   enabled: boolean;
+  latestAt: string;
+  stale: boolean;
 }
 
 interface SourceGroup {
@@ -19,6 +24,7 @@ interface SourceGroup {
 
 @Component({
   selector: 'df-sources-panel',
+  imports: [TimeAgoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="backdrop" (click)="close.emit()"></div>
@@ -38,6 +44,11 @@ interface SourceGroup {
               <label class="row">
                 <input type="checkbox" [checked]="row.enabled" (change)="state.toggleSource(row.id)" />
                 <span class="name">{{ row.name }}</span>
+                @if (row.latestAt) {
+                  <span class="age" [class.stale]="row.stale">{{ row.latestAt | timeAgo }}</span>
+                } @else {
+                  <span class="age stale">no items</span>
+                }
               </label>
             }
           </div>
@@ -121,6 +132,17 @@ interface SourceGroup {
         width: 16px;
         height: 16px;
       }
+      .name {
+        flex: 1;
+      }
+      .age {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+      }
+      .age.stale {
+        color: var(--angular);
+      }
     `,
   ],
 })
@@ -130,14 +152,20 @@ export class SourcesPanelComponent {
 
   readonly groups = computed<SourceGroup[]>(() => {
     const disabled = new Set(this.state.disabledSourceIds());
+    const latestBySource = this.state.latestBySource();
+    const staleThreshold = Date.now() - STALE_DAYS * 24 * 60 * 60 * 1000;
     const byCategory = new Map<Category, SourceRow[]>();
     for (const source of this.state.sources()) {
       const rows = byCategory.get(source.category) ?? [];
+      const latestAt = latestBySource.get(source.id) ?? '';
+      const stale = !latestAt || new Date(latestAt).getTime() < staleThreshold;
       rows.push({
         id: source.id,
         name: source.name,
         colorVar: `var(--${source.category})`,
         enabled: !disabled.has(source.id),
+        latestAt,
+        stale,
       });
       byCategory.set(source.category, rows);
     }

@@ -8,6 +8,8 @@ export interface Prefs {
   readArticleIds: string[];
   theme: string;
   lastVisitAt: string;
+  lastCategory: string;
+  lastView: string;
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -17,6 +19,8 @@ export const DEFAULT_PREFS: Prefs = {
   readArticleIds: [],
   theme: 'midnight',
   lastVisitAt: '',
+  lastCategory: 'all',
+  lastView: 'all',
 };
 
 const STORAGE_KEY = 'devfeed.prefs';

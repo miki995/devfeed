@@ -3,10 +3,11 @@ import { FeedGlobalStateService } from '../core/feed.state';
 import { ArticleCardComponent } from './article-card.component';
 import { ChannelRailComponent } from './channel-rail.component';
 import { ReleaseTickerComponent } from './release-ticker.component';
+import { TimeAgoPipe } from './time-ago.pipe';
 
 @Component({
   selector: 'df-feed-home',
-  imports: [ArticleCardComponent, ChannelRailComponent, ReleaseTickerComponent],
+  imports: [ArticleCardComponent, ChannelRailComponent, ReleaseTickerComponent, TimeAgoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <df-release-ticker [releases]="state.latestReleases()" />
@@ -37,7 +38,12 @@ import { ReleaseTickerComponent } from './release-ticker.component';
               }
             </button>
           </div>
-          <span class="meta">{{ state.visibleArticles().length }} stories</span>
+          <span class="meta">
+            {{ state.visibleArticles().length }} stories
+            @if (state.generatedAt()) {
+              · updated {{ state.generatedAt() | timeAgo }}
+            }
+          </span>
         </div>
 
         @if (state.loading()) {
@@ -53,7 +59,15 @@ import { ReleaseTickerComponent } from './release-ticker.component';
               (markRead)="state.markRead($event)"
             />
           } @empty {
-            <p class="status">Nothing matches your filters yet. Try another channel.</p>
+            @if (state.view() === 'saved') {
+              <div class="empty">
+                <p class="empty-title">No saved stories yet</p>
+                <p class="empty-sub">Tap the ★ on any story to keep it here for later.</p>
+                <button type="button" class="empty-action" (click)="state.setView('all')">Browse Latest</button>
+              </div>
+            } @else {
+              <p class="status">Nothing matches your filters yet. Try another channel.</p>
+            }
           }
         }
       </main>
@@ -115,6 +129,30 @@ import { ReleaseTickerComponent } from './release-ticker.component';
         font-family: var(--mono);
         font-size: 13px;
         padding: 40px 0;
+      }
+      .empty {
+        padding: 60px 0;
+        text-align: center;
+      }
+      .empty-title {
+        font-family: var(--serif);
+        font-size: 20px;
+        margin: 0 0 6px;
+      }
+      .empty-sub {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0 0 18px;
+      }
+      .empty-action {
+        border: 1px solid var(--accent);
+        background: transparent;
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 13px;
+        padding: 9px 18px;
+        border-radius: 8px;
+        cursor: pointer;
       }
       @media (max-width: 860px) {
         .layout {
