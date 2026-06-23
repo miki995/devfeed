@@ -23,14 +23,23 @@ const THEMES: ThemeOption[] = [
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:keydown)': 'onKeydown($event)' },
+  host: { '(document:keydown)': 'onKeydown($event)', '(window:scroll)': 'onScroll()' },
 })
 export class App {
   protected readonly state = inject(FeedGlobalStateService);
   protected readonly themeLabel = computed(() => THEMES.find((theme) => theme.id === this.state.theme())?.label ?? 'Midnight');
   protected readonly sourcesOpen = signal<boolean>(false);
   protected readonly helpOpen = signal<boolean>(false);
+  protected readonly scrolled = signal<boolean>(false);
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+
+  protected onScroll(): void {
+    this.scrolled.set(window.scrollY > 600);
+  }
+
+  protected scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   protected toggleSources(open: boolean): void {
     this.sourcesOpen.set(open);

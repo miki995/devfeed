@@ -25,6 +25,10 @@
   <footer class="footnote">feeds rebuilt every 2h · no backend · open source</footer>
 </div>
 
+@if (scrolled()) {
+  <button type="button" class="to-top" aria-label="Scroll to top" (click)="scrollToTop()">↑</button>
+}
+
 @if (sourcesOpen()) {
   <df-sources-panel (close)="toggleSources(false)" />
 }

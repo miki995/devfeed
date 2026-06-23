@@ -3,11 +3,24 @@ import { join } from 'path';
 import { SOURCES } from './sources';
 import { fetchSource } from './fetch-feed';
 import { aggregate } from './aggregate';
+import { fetchFullText, mapWithPool } from './extract';
+
+const MIN_CONTENT_LENGTH = 280;
 
 async function run(): Promise<void> {
   const enabledSources = SOURCES.filter((source) => source.enabled);
   const perSourceResults = await Promise.all(enabledSources.map((source) => fetchSource(source)));
   const bundle = aggregate(perSourceResults, SOURCES);
+
+  const needsContent = bundle.articles.filter((article) => !article.content);
+  let recovered = 0;
+  await mapWithPool(needsContent, 8, async (article) => {
+    const fullText = await fetchFullText(article.url);
+    if (fullText.length >= MIN_CONTENT_LENGTH) {
+      article.content = fullText;
+      recovered += 1;
+    }
+  });
 
   const dataDir = join(__dirname, '..', '..', 'app', 'public', 'data');
   const articlesDir = join(dataDir, 'articles');
@@ -29,7 +42,9 @@ async function run(): Promise<void> {
   writeFileSync(join(dataDir, 'news.json'), JSON.stringify(indexBundle));
   writeFileSync(join(dataDir, 'sources.json'), JSON.stringify(SOURCES));
 
-  console.log(`[devfeed] wrote ${bundle.count} articles (${withContent} readable in-app) from ${enabledSources.length} sources`);
+  console.log(
+    `[devfeed] wrote ${bundle.count} articles (${withContent} readable in-app, ${recovered} recovered by extraction) from ${enabledSources.length} sources`,
+  );
 }
 
 run().catch((error) => {
