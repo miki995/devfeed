@@ -1,1 +1,0 @@
-{"id":"e474d3f43e1f","content":"Misc Changes\n\n• Let LLMs create less noisy and more focused PR descriptions: #94896\n\n• Avoid re-logging server-originated errors forwarded from the browser: #94917\n\n• [ci] Only install chromium-headless-shell and not chromium: #94882\n\nCredits\n\nHuge thanks to @eps1lon, @unstubbable, and @bgw for helping!"}

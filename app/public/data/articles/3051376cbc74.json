@@ -1,0 +1,1 @@
+{"id":"3051376cbc74","content":"Misc Changes\n\n• docs(cache-components): clarify allow-runtime, sync-IO and instant=false, CLS fallback: #94997\n\n• Keep the resolved cache life for cacheMaxMemorySize: 0 caches in dev: #95100\n\n• Avoid mutating req.headers when stripping internal headers: #95116\n\nCredits\n\nHuge thanks to @aurorascharff and @unstubbable for helping!"}
