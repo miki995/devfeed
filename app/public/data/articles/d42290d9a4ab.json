@@ -1,0 +1,1 @@
+{"id":"d42290d9a4ab","content":"Package managers aren't as interchangeable as they seem. This post digs into the real differences in how npm, Yarn, pnpm, Bun, and Deno handle dependencies under the hood and why that matters when things break in practice.\n\n&#32; submitted by &#32; /u/OtherwisePush6424\n[link] &#32; [comments]"}
