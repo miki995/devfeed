@@ -1,1 +1,0 @@
-{"id":"864ccaa0b015","content":"Why console.log() can be misleading in browser DevTools: live object references, promises that look different when expanded later, logs changing timing-sensitive behavior, stale React state after updates, and source maps pointing at surprising line numbers.\n\n&#32; submitted by &#32; /u/OtherwisePush6424\n[link] &#32; [comments]"}
