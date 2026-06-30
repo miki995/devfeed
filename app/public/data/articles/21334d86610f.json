@@ -1,1 +1,0 @@
-{"id":"21334d86610f","content":"Ayush Mishra\n\n4 hours ago\n\n--\n\nJavaScript\n\n• Prefer const by default\n\n• Use let when the value changes\n\n• Avoid var in modern JavaScript\n\n• 7 primitive data types : string, number, bigint, boolean, null, symbol, undefined\n\n• Non-Primitive (Reference Types) : object, array, function"}
