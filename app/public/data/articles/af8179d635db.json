@@ -1,1 +1,0 @@
-{"id":"af8179d635db","content":"Misc Changes\n\n• Consider merging chunks when overlap == 1: #95102\n\n• [turbopack] Add support for single-entry chunks: #94727\n\n• Turbopack: add TURBOPACK_DEBUG_CSS_CHUNKING env var: #95080\n\n• [cd] publish on release tags instead of branch push: #95085\n\nCredits\n\nHuge thanks to @sampoder, @sokra, and @eps1lon for helping!"}

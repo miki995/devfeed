@@ -1,0 +1,1 @@
+{"id":"8e9783654c21","content":"Ayush Mishra\n\n1 hour ago\n\n--\n\nJavaScript\n\n• JavaScript is single-threaded => one call stack, executes one task at a time\n\n• Call stack stores function execution. LIFO\nx — x — x — x — x — x — x — x — x — x — x — x\nEvent loop\nallows JavaScript(single-threaded) to handle asynchronous operations without blocking the main thread"}
