@@ -1,1 +1,0 @@
-{"id":"efce705629e1","content":"Ayush Mishra\n\n1 hour ago\n\n--\n\nJavaScript\nPrimitive and Reference data types in JS :\n\n• primitive (copied by value) : number, string, boolean, bigint, null, undefined, symbol\n\n• reference (copied by reference) : object, array, function\n\n• let, var and const\n\n• prefer const by default, let when reassignment is needed, avoid var"}
