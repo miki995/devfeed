@@ -1,1 +1,0 @@
-{"id":"eee0555846d6","content":"I've been wondering for a while if anything in Unicode could accidentally compute. It turns out that UTS #35 transliteration rules are Turing-complete. I show how to compute Collatz with just 3 rewrite rules running on stock ICU, shipped with every major OS.\n\n&#32; submitted by &#32; /u/Dull_Replacement8890\n[link] &#32; [comments]"}
