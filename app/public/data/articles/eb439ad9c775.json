@@ -1,1 +1,0 @@
-{"id":"eb439ad9c775","content":"I used to do the \"proper\" parser generation work some time ago and found out that a good enough generator has to make so many opinionated decisions that it starts to feel like writing a… small natural language translation level nuanced machine. Thus the attempt to use modern coding LLMs to please each and every picky user.\n\nComments"}
