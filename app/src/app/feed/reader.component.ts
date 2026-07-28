@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
@@ -180,31 +180,46 @@ export class ReaderComponent {
   readonly content = computed(() => this.contentState().content);
   readonly shareLabel = signal<string>('Share');
 
+  private restoredFor: string | null = null;
+  private scrollFrame: number | null = null;
+
   constructor() {
+    // `openArticle` reads and writes prefs. Tracking that read would make this
+    // effect its own dependency and loop forever on every commit.
     effect(() => {
       const id = this.articleId();
       if (id) {
-        this.state.openArticle(id);
+        untracked(() => this.state.openArticle(id));
       }
     });
 
+    // Restore at most once per article: re-running would yank the page back
+    // under a reader who has already started scrolling.
     effect(() => {
       const id = this.articleId();
       const ready = this.loaded() || !!this.content();
-      if (id && ready) {
-        const target = this.state.getScroll(id);
-        if (target > 0) {
-          requestAnimationFrame(() => window.scrollTo(0, target));
-        }
+      if (!id || !ready || this.restoredFor === id) {
+        return;
+      }
+      this.restoredFor = id;
+      const target = untracked(() => this.state.getScroll(id));
+      if (target > 0) {
+        requestAnimationFrame(() => window.scrollTo(0, target));
       }
     });
   }
 
   onScroll(): void {
-    const id = this.articleId();
-    if (id) {
-      this.state.setScroll(id, window.scrollY);
+    if (this.scrollFrame !== null) {
+      return;
     }
+    this.scrollFrame = requestAnimationFrame(() => {
+      this.scrollFrame = null;
+      const id = this.articleId();
+      if (id) {
+        this.state.setScroll(id, window.scrollY);
+      }
+    });
   }
 
   share(url: string, title: string): void {

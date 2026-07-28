@@ -54,6 +54,35 @@ describe('FeedGlobalStateService', () => {
     expect(loadPrefs().readArticleIds).toContain('a');
   });
 
+  it('does not touch reactive prefs when recording scroll offsets', () => {
+    const service = createService();
+    const before = service.readArticleIds();
+    service.setScroll('a', 120);
+    service.setScroll('a', 340);
+    expect(service.getScroll('a')).toBe(340);
+    // Same array identity means no computed downstream of prefs was invalidated.
+    expect(service.readArticleIds()).toBe(before);
+  });
+
+  it('caps stored scroll offsets and keeps the newest', () => {
+    const service = createService();
+    for (let index = 0; index < 250; index += 1) {
+      service.setScroll(`id-${index}`, index + 1);
+    }
+    expect(service.getScroll('id-0')).toBe(0); // evicted, falls back to the default
+    expect(service.getScroll('id-249')).toBe(250);
+    const exported = JSON.parse(service.exportData()) as { scrollPositions: Record<string, number> };
+    expect(Object.keys(exported.scrollPositions).length).toBe(200);
+  });
+
+  it('treats reopening the same article as a no-op', () => {
+    const service = createService();
+    service.openArticle('a');
+    const history = service.recentlyOpened();
+    service.openArticle('a');
+    expect(service.recentlyOpened()).toBe(history);
+  });
+
   it('clears saved articles', () => {
     const service = createService();
     service.toggleSaved('a');

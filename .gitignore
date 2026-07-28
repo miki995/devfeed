@@ -1,5 +1,9 @@
 node_modules/
 dist/
+
+# Scraper output. Generated fresh in CI and bundled into the Pages artifact, never
+# committed: it churned ~950 files per run and tripped secret scanning on scraped text.
+app/public/data/
 .angular/
 coverage/
 *.log

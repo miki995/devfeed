@@ -5,16 +5,16 @@ best-practice reads across frontend, backend and AI — including coding agents 
 Claude Code and Cursor — into a single, filterable feed.
 
 It runs as a progressive web app, so it works in the browser and installs to your
-phone or desktop. There is no server to pay for: a scheduled job fetches the feeds
-and commits them as static JSON, and the app reads that.
+phone or desktop. There is no server to pay for: a scheduled job fetches the feeds,
+writes them as static JSON, and ships that alongside the app.
 
 ## How it works
 
 ```
-GitHub Actions (every 2h)
+GitHub Actions (every 2h, and on every push to main)
   -> scraper fetches RSS / Atom / APIs
-  -> writes app/public/data/news.json
-  -> commits it back
+  -> writes app/public/data/*.json
+  -> ng build bundles app + data into one artifact
 
 GitHub Pages
   -> serves the app + the JSON
@@ -23,13 +23,18 @@ Browser / installed PWA
   -> reads the JSON, filters happen on the client
 ```
 
+The scraped JSON is **not committed**. It is regenerated on every run and lives only
+in the deployed artifact, which keeps the repo small and keeps scraped text (which
+sometimes contains credential-shaped strings) out of git history. A scrape that
+returns too little data fails the job, leaving the previous deployment live.
+
 ## Project layout
 
 ```
 shared/    TypeScript types shared by the scraper and the app
 scraper/   Node + TypeScript, fetches and normalizes the feeds
 app/       Angular PWA
-.github/   scheduled scrape + Pages deploy
+.github/   one workflow: scrape -> build -> Pages deploy
 ```
 
 ## Running locally
@@ -40,6 +45,10 @@ npm install
 npm --workspace scraper run build:data   # fetch feeds into app/public/data
 npm --workspace app start                # serve the app on http://localhost:4200
 ```
+
+The scraper step is required before the first run — `app/public/data` is generated and
+not checked in, so the feed is empty without it. Re-running it only rewrites the
+articles that actually changed.
 
 Run the tests:
 

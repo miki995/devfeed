@@ -2,7 +2,10 @@ import RssParser from 'rss-parser';
 import type { Article, Source } from '@shared/index';
 import { hashUrl, summarize, toReadableText } from './normalize';
 
-const rssParser = new RssParser({ timeout: 15000 });
+const USER_AGENT = 'devfeed-scraper (+https://github.com/miki995/devfeed)';
+
+// Several feeds (reddit especially) reject the default parser UA with 429.
+const rssParser = new RssParser({ timeout: 15000, headers: { 'user-agent': USER_AGENT } });
 
 interface HackerNewsHit {
   objectID: string;
@@ -98,7 +101,7 @@ export function parseRssItems(source: Source, items: RssItem[]): Article[] {
 }
 
 async function fetchJson(url: string): Promise<unknown> {
-  const response = await fetch(url, { headers: { 'user-agent': 'devfeed-scraper' } });
+  const response = await fetch(url, { headers: { 'user-agent': USER_AGENT } });
   if (!response.ok) {
     throw new Error(`HTTP ${response.status} for ${url}`);
   }

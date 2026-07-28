@@ -16,6 +16,8 @@ export type FeedView = 'all' | 'saved' | 'trending';
 
 const HISTORY_LIMIT = 30;
 const RECENT_LIMIT = 6;
+const SCROLL_LIMIT = 200;
+const SCROLL_FLUSH_MS = 750;
 
 interface FeedState {
   loading: boolean;
@@ -31,6 +33,14 @@ export class FeedGlobalStateService {
   private readonly api = inject(FeedApiService);
   private readonly prefs = signal<Prefs>(loadPrefs());
   private readonly previousVisitAt: string;
+
+  /**
+   * Scroll offsets are written on every scroll event, so they are deliberately kept
+   * out of the `prefs` signal: a signal write per event would invalidate every derived
+   * computed and re-run effects that read them. Persisted on a debounce instead.
+   */
+  private scrollPositions: Record<string, number> = {};
+  private scrollFlushTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly selectedCategory = signal<Category | 'all'>('all');
   readonly searchText = signal<string>('');
@@ -48,6 +58,7 @@ export class FeedGlobalStateService {
   constructor() {
     const stored = this.prefs();
     this.previousVisitAt = stored.lastVisitAt;
+    this.scrollPositions = { ...stored.scrollPositions };
     this.selectedCategory.set(isCategory(stored.lastCategory) ? stored.lastCategory : 'all');
     this.view.set(stored.lastView === 'saved' ? 'saved' : 'all');
     this.commit({ ...stored, lastVisitAt: new Date().toISOString() });
@@ -165,6 +176,9 @@ export class FeedGlobalStateService {
 
   openArticle(articleId: string): void {
     const current = this.prefs();
+    if (current.history[0] === articleId && current.readArticleIds.includes(articleId)) {
+      return;
+    }
     const history = [articleId, ...current.history.filter((id) => id !== articleId)].slice(0, HISTORY_LIMIT);
     const readArticleIds = current.readArticleIds.includes(articleId)
       ? current.readArticleIds
@@ -173,12 +187,24 @@ export class FeedGlobalStateService {
   }
 
   getScroll(articleId: string): number {
-    return this.prefs().scrollPositions[articleId] ?? 0;
+    return this.scrollPositions[articleId] ?? 0;
   }
 
   setScroll(articleId: string, position: number): void {
-    const current = this.prefs();
-    this.commit({ ...current, scrollPositions: { ...current.scrollPositions, [articleId]: position } });
+    const isNew = !(articleId in this.scrollPositions);
+    this.scrollPositions[articleId] = position;
+    if (isNew) {
+      const ids = Object.keys(this.scrollPositions);
+      for (const stale of ids.slice(0, Math.max(0, ids.length - SCROLL_LIMIT))) {
+        delete this.scrollPositions[stale];
+      }
+    }
+    if (this.scrollFlushTimer === null) {
+      this.scrollFlushTimer = setTimeout(() => {
+        this.scrollFlushTimer = null;
+        this.persist(this.prefs());
+      }, SCROLL_FLUSH_MS);
+    }
   }
 
   addMutedKeyword(keyword: string): void {
@@ -194,13 +220,15 @@ export class FeedGlobalStateService {
   }
 
   exportData(): string {
-    return JSON.stringify(this.prefs(), null, 2);
+    return JSON.stringify({ ...this.prefs(), scrollPositions: this.scrollPositions }, null, 2);
   }
 
   importData(json: string): boolean {
     try {
       const parsed = JSON.parse(json) as Partial<Prefs>;
-      this.commit({ ...DEFAULT_PREFS, ...this.prefs(), ...parsed });
+      const next = { ...DEFAULT_PREFS, ...this.prefs(), ...parsed };
+      this.scrollPositions = { ...next.scrollPositions };
+      this.commit(next);
       return true;
     } catch {
       return false;
@@ -258,6 +286,10 @@ export class FeedGlobalStateService {
 
   private commit(next: Prefs): void {
     this.prefs.set(next);
-    savePrefs(next);
+    this.persist(next);
+  }
+
+  private persist(next: Prefs): void {
+    savePrefs({ ...next, scrollPositions: this.scrollPositions });
   }
 }

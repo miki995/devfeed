@@ -1,8 +1,13 @@
 name: deploy
 
+# Scrapes the feeds and deploys app + data as a single Pages artifact. The data is
+# never committed back to the repo, so both a code push and the schedule run the same
+# pipeline. A failed scrape fails the job and leaves the previous deployment live.
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
@@ -12,11 +17,12 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -26,6 +32,12 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Scrape feeds into app/public/data
+        run: npm --workspace scraper run build:data
+        timeout-minutes: 15
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AI_SUMMARY_LIMIT: '40'
       - run: npm --workspace app run build -- --base-href /devfeed/
       - run: cp app/dist/app/browser/index.html app/dist/app/browser/404.html
       - uses: actions/configure-pages@v5
