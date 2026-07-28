@@ -2,7 +2,7 @@ import { mkdirSync } from 'fs';
 import { join } from 'path';
 import type { Article, SearchEntry } from '@shared/index';
 import { SOURCES } from './sources';
-import { fetchSource } from './fetch-feed';
+import { fetchAllSources } from './fetch-feed';
 import { aggregate } from './aggregate';
 import { fetchFullText, mapWithPool } from './extract';
 import { readingMinutes } from './normalize';
@@ -26,7 +26,7 @@ function redactArticle(article: Article): void {
 
 async function run(): Promise<void> {
   const enabledSources = SOURCES.filter((source) => source.enabled);
-  const perSourceResults = await Promise.all(enabledSources.map((source) => fetchSource(source)));
+  const perSourceResults = await fetchAllSources(enabledSources);
   const bundle = aggregate(perSourceResults, SOURCES);
 
   const needsContent = bundle.articles.filter((article) => !article.content);

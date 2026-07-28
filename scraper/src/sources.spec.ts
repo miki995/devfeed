@@ -19,6 +19,17 @@ describe('SOURCES catalog', () => {
     );
   });
 
+  it('is free of feeds removed for being dead', () => {
+    // 404 / feed withdrawn as of 2026-07-28. Re-adding one needs a working URL first.
+    const retired = ['anthropic-news', 'langchain-blog', 'mistral-news', 'llamaindex-blog'];
+    const present = SOURCES.filter((source) => retired.includes(source.id)).map((source) => source.id);
+    expect(present).toEqual([]);
+  });
+
+  it('has every source enabled', () => {
+    expect(SOURCES.filter((source) => !source.enabled)).toEqual([]);
+  });
+
   it('uses only supported source types', () => {
     const badType = SOURCES.filter((source) => !['rss', 'hackernews', 'devto'].includes(source.type));
     expect(badType).toEqual([]);

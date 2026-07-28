@@ -36,6 +36,11 @@ interface RssItem {
 }
 
 const MIN_CONTENT_LENGTH = 280;
+const SAME_HOST_DELAY_MS = 2500;
+const RETRY_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 6000;
+
+const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 function buildContent(html: string | undefined): { content?: string; hasContent: boolean } {
   const readable = toReadableText(html);
@@ -108,20 +113,77 @@ async function fetchJson(url: string): Promise<unknown> {
   return response.json();
 }
 
+/** Buckets sources by hostname so requests to one host can be spaced out. */
+export function groupByHost(sources: Source[]): Source[][] {
+  const byHost = new Map<string, Source[]>();
+  for (const source of sources) {
+    let host = source.url;
+    try {
+      host = new URL(source.url).host;
+    } catch {
+      // Not a parseable URL — treat the raw string as its own bucket.
+    }
+    const bucket = byHost.get(host);
+    if (bucket) {
+      bucket.push(source);
+    } else {
+      byHost.set(host, [source]);
+    }
+  }
+  return [...byHost.values()];
+}
+
+/**
+ * Hits every host in parallel but its sources one at a time. Firing all sources at
+ * once meant 8 simultaneous requests to dev.to and 3 to reddit, which answered 429 —
+ * making healthy sources look dead.
+ */
+export async function fetchAllSources(sources: Source[]): Promise<Article[][]> {
+  const groups = await Promise.all(
+    groupByHost(sources).map(async (group) => {
+      const results: Article[][] = [];
+      for (const [index, source] of group.entries()) {
+        if (index > 0) {
+          await delay(SAME_HOST_DELAY_MS);
+        }
+        results.push(await fetchSource(source));
+      }
+      return results;
+    }),
+  );
+  return groups.flat();
+}
+
+async function fetchOnce(source: Source): Promise<Article[]> {
+  if (source.type === 'hackernews') {
+    const payload = (await fetchJson(source.url)) as { hits: HackerNewsHit[] };
+    return parseHackerNews(source, payload);
+  }
+  if (source.type === 'devto') {
+    const items = (await fetchJson(source.url)) as DevtoItem[];
+    return parseDevto(source, items);
+  }
+  const feed = await rssParser.parseURL(source.url);
+  return parseRssItems(source, (feed.items ?? []) as RssItem[]);
+}
+
+export function isRateLimit(message: string): boolean {
+  return message.includes('429');
+}
+
 export async function fetchSource(source: Source): Promise<Article[]> {
-  try {
-    if (source.type === 'hackernews') {
-      const payload = (await fetchJson(source.url)) as { hits: HackerNewsHit[] };
-      return parseHackerNews(source, payload);
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await fetchOnce(source);
+    } catch (error) {
+      const message = (error as Error).message;
+      // Reddit and dev.to throttle hard; one backed-off retry recovers most of them.
+      if (attempt < RETRY_ATTEMPTS && isRateLimit(message)) {
+        await delay(RETRY_DELAY_MS * (attempt + 1));
+        continue;
+      }
+      console.warn(`[devfeed] skipping ${source.id}: ${message}`);
+      return [];
     }
-    if (source.type === 'devto') {
-      const items = (await fetchJson(source.url)) as DevtoItem[];
-      return parseDevto(source, items);
-    }
-    const feed = await rssParser.parseURL(source.url);
-    return parseRssItems(source, (feed.items ?? []) as RssItem[]);
-  } catch (error) {
-    console.warn(`[devfeed] skipping ${source.id}: ${(error as Error).message}`);
-    return [];
   }
 }

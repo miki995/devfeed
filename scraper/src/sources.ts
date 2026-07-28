@@ -14,10 +14,8 @@ export const SOURCES: Source[] = [
 
   { id: 'claude-code-releases', name: 'Claude Code releases', category: 'ai-agents', type: 'rss', url: 'https://github.com/anthropics/claude-code/releases.atom', enabled: true },
   { id: 'cursor-changelog', name: 'Cursor changelog', category: 'ai-agents', type: 'rss', url: 'https://www.cursor.com/changelog/rss.xml', enabled: true },
-  { id: 'anthropic-news', name: 'Anthropic news', category: 'ai-agents', type: 'rss', url: 'https://www.anthropic.com/news/rss.xml', enabled: false },
   { id: 'openai-blog', name: 'OpenAI blog', category: 'ai-integration', type: 'rss', url: 'https://openai.com/blog/rss.xml', enabled: true },
   { id: 'huggingface-blog', name: 'Hugging Face blog', category: 'ai-integration', type: 'rss', url: 'https://huggingface.co/blog/feed.xml', enabled: true },
-  { id: 'langchain-blog', name: 'LangChain blog', category: 'ai-integration', type: 'rss', url: 'https://blog.langchain.dev/rss/', enabled: true },
 
   { id: 'angular-blog', name: 'Angular blog', category: 'angular', type: 'rss', url: 'https://blog.angular.dev/feed', enabled: true },
   { id: 'angular-releases', name: 'Angular releases', category: 'angular', type: 'rss', url: 'https://github.com/angular/angular/releases.atom', enabled: true },
@@ -52,8 +50,6 @@ export const SOURCES: Source[] = [
   { id: 'aider-releases', name: 'Aider releases', category: 'ai-agents', type: 'rss', url: 'https://github.com/Aider-AI/aider/releases.atom', enabled: true },
   { id: 'github-copilot-changelog', name: 'GitHub Changelog', category: 'ai-agents', type: 'rss', url: 'https://github.blog/changelog/feed/', enabled: true },
   { id: 'google-ai-blog', name: 'Google AI blog', category: 'ai-integration', type: 'rss', url: 'https://blog.google/technology/ai/rss/', enabled: true },
-  { id: 'mistral-news', name: 'Mistral AI', category: 'ai-integration', type: 'rss', url: 'https://mistral.ai/news/feed.xml', enabled: true },
-  { id: 'llamaindex-blog', name: 'LlamaIndex blog', category: 'ai-integration', type: 'rss', url: 'https://www.llamaindex.ai/blog/feed', enabled: true },
 
   { id: 'css-tricks', name: 'CSS-Tricks', category: 'frontend', type: 'rss', url: 'https://css-tricks.com/feed/', enabled: true },
   { id: 'smashing-magazine', name: 'Smashing Magazine', category: 'frontend', type: 'rss', url: 'https://www.smashingmagazine.com/feed/', enabled: true },
